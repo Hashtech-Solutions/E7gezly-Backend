@@ -2,6 +2,11 @@ import passport from "passport";
 import bcrypt from "bcrypt";
 import { Strategy as LocalStrategy } from "passport-local";
 import * as userService from "../services/userService.js";
+// import google strategy
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 passport.use(
   "local",
@@ -16,14 +21,40 @@ passport.use(
         if (!user) {
           return done(null, false, { message: "Incorrect username." });
         }
-        // const isPasswordValid = await bcrypt.compare(password, user.password);
-        // if (!isPasswordValid) {
-        //   return done(null, false, { message: "Incorrect password." });
-        // }
-        if (password !== user.password) {
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
           return done(null, false, { message: "Incorrect password." });
         }
         return done(null, user);
+      } catch (error) {
+        return done(error);
+      }
+    }
+  )
+);
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: `${process.env.DOMAIN}/api/auth/google/callback`,
+      passReqToCallback: true,
+    },
+    async (req, accessToken, refreshToken, profile, done) => {
+      try {
+        const userName = profile.emails[0].value.split("@")[0];
+        const user = await userService.getUserByUserName(userName);
+        if (user) {
+          return done(null, user);
+        }
+        const newUser = {
+          userName,
+          password: await bcrypt.hash(profile.id, 10),
+          role: "customer",
+        };
+        const createdUser = await userService.createUser(newUser);
+        return done(null, createdUser);
       } catch (error) {
         return done(error);
       }
