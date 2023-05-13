@@ -1,8 +1,12 @@
 import express, { application } from "express";
-import mongoose from "mongoose";
+import connectDB from "./config/database.js";
 import dotenv from "dotenv";
 
+dotenv.config();
+
 const app = express();
+
+connectDB();
 
 app.get("/", (req, res) => {
   res.send("Hello World");
