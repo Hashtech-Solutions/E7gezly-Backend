@@ -2,7 +2,6 @@ import passport from "passport";
 import bcrypt from "bcrypt";
 import { Strategy as LocalStrategy } from "passport-local";
 import * as userService from "../services/userService.js";
-// import google strategy
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
 
