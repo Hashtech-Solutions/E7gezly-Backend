@@ -1,0 +1,7 @@
+{
+  "package": "./package.json",
+  "parallel": false,
+  "spec": "src/test/**/*.test.js",
+  "timeout": 1500000,
+  "exit": true
+}

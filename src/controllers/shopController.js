@@ -13,7 +13,7 @@ export const createShop = async (req, res, next) => {
     const createdShop = await shopService.createShop(shop, shopModerator);
     res.status(200).json(createdShop);
   } catch (error) {
-    return next({ status: 400, message: error });
+    return next({ status: 400, message: error }, req, res, next);
   }
 };
 
