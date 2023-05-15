@@ -4,6 +4,7 @@ import shop from "./shopRoutes.js";
 import shopModerator from "./shopModeratorRoutes.js";
 import passport from "passport";
 import fetchShopId from "../middleware/fetchShop.js";
+import customer from "./customerRoutes.js";
 
 const router = express.Router();
 
@@ -19,5 +20,6 @@ router.use(
   passport.authorize("shopModerator"),
   shopModerator
 );
+router.use("/customer", passport.authorize("customer"), customer);
 
 export default router;

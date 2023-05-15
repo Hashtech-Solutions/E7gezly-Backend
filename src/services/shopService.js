@@ -22,9 +22,9 @@ export const createShop = async (shop, shopModerator) => {
   }
 };
 
-export const getManyShops = async (query) => {
+export const getManyShops = async (query, select = "") => {
   try {
-    const shops = await Shop.find(query);
+    const shops = await Shop.find(query).select(select);
     return shops;
   } catch (error) {
     throw new Error(error);
