@@ -87,7 +87,7 @@ passport.authorize = (role) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    if (role === "shopModerator" && req.user.shopId !== req.params.shopId) {
+    if (role === "shopModerator" && req.user.shopId != req.shopId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 

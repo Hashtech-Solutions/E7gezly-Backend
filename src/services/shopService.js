@@ -51,6 +51,17 @@ export const updateShopById = async (id, update) => {
   }
 };
 
+export const addRoom = async (id, room) => {
+  try {
+    const shop = await Shop.findById(id);
+    shop.rooms.push(room);
+    await shop.save();
+    return shop;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const deleteShopById = async (id) => {
   try {
     const deletedShop = await Shop.findByIdAndDelete(id);

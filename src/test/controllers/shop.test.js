@@ -1,5 +1,6 @@
 import { expect } from "chai";
-import * as shopController from "../../controllers/shopController.js";
+import * as shopAdminController from "../../controllers/shopAdminController.js";
+import * as shopModeratorController from "../../controllers/shopModeratorController.js";
 import errorHandler from "../../middleware/errorHandler.js";
 
 describe("shopController", () => {
@@ -23,7 +24,7 @@ describe("shopController", () => {
       },
     };
 
-    await shopController.createShop(req, res, errorHandler);
+    await shopAdminController.createShop(req, res, errorHandler);
     shopId = res.data._id;
     expect(res.statusCode).to.equal(200);
     expect(res.data).to.be.an("object");
@@ -46,7 +47,11 @@ describe("shopController", () => {
         return this;
       },
     };
-    const newShop = await shopController.createShop(req, res, errorHandler);
+    const newShop = await shopAdminController.createShop(
+      req,
+      res,
+      errorHandler
+    );
     expect(res.statusCode).to.equal(400);
     expect(res.data).to.be.an("object");
   });
@@ -64,7 +69,11 @@ describe("shopController", () => {
       },
     };
 
-    const shops = await shopController.getManyShops(req, res, errorHandler);
+    const shops = await shopAdminController.getManyShops(
+      req,
+      res,
+      errorHandler
+    );
     expect(res.statusCode).to.equal(200);
     expect(res.data).to.be.an("array");
   });
@@ -86,8 +95,38 @@ describe("shopController", () => {
       },
     };
 
-    const shop = await shopController.getShopById(req, res, errorHandler);
+    const shop = await shopAdminController.getShopById(req, res, errorHandler);
     expect(res.statusCode).to.equal(200);
+    expect(res.data).to.be.an("object");
+  });
+
+  it("should add room to shop", async () => {
+    const req = {
+      shopId: shopId,
+      body: {
+        name: "test",
+        description: "test",
+        capacity: 10,
+        price: 10,
+      },
+    };
+    const res = {
+      status: function (code) {
+        this.statusCode = code;
+        return this;
+      },
+      json: function (data) {
+        this.data = data;
+        return this;
+      },
+    };
+
+    const room = await shopModeratorController.addRoom(req, res, errorHandler);
+    expect(res.statusCode).to.equal(200);
+    expect(res.data).to.be.an("object");
+    // shouldn't add room with non-unqiue name
+    const room2 = await shopModeratorController.addRoom(req, res, errorHandler);
+    expect(res.statusCode).to.equal(400);
     expect(res.data).to.be.an("object");
   });
 });

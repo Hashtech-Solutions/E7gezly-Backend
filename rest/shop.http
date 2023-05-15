@@ -1,5 +1,6 @@
 POST http://localhost:3000/api/admin/shop
 Content-Type: application/json
+shopId: test
 
 {
     "userName": "John Cena",
@@ -9,3 +10,16 @@ Content-Type: application/json
 
 ############################################
 GET http://localhost:3000/api/admin/shop
+
+
+############################################
+GET http://localhost:3000/api/admin/shop/6460e5b32d30e05fec5f6319
+
+############################################
+POST http://localhost:3000/api/moderator/shop/room
+Content-Type: application/json
+shop-id: 6460e5b32d30e05fec5f6319
+
+{
+    "name": "room2"
+}

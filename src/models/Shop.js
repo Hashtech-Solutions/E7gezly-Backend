@@ -26,6 +26,8 @@ const roomSchema = mongoose.Schema({
   _id: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+    // auto-generate a new ObjectId
+    default: () => new mongoose.Types.ObjectId(),
   },
   name: {
     type: String,
@@ -119,8 +121,16 @@ const shopSchema = mongoose.Schema({
   ],
 });
 
-// set the room name to unique within the shop
-shopSchema.index({ name: 1, "rooms.name": 1 }, { unique: true });
+// verify that roomNames are unique for the same shop
+shopSchema.pre("save", async function (next) {
+  const shop = this;
+  const roomNames = shop.rooms.map((room) => room.name);
+  const uniqueRoomNames = new Set(roomNames);
+  if (roomNames.length !== uniqueRoomNames.size) {
+    throw new Error("Room names must be unique");
+  }
+  next();
+});
 
 const Shop = mongoose.model("Shop", shopSchema);
 
