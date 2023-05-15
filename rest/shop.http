@@ -3,9 +3,9 @@ Content-Type: application/json
 shopId: test
 
 {
-    "userName": "John Cena",
+    "userName": "The Rock",
     "password": "123456",
-    "name": "العالمي"
+    "name": "Powerstation"
 }
 
 ############################################
@@ -18,8 +18,45 @@ GET http://localhost:3000/api/admin/shop/6460e5b32d30e05fec5f6319
 ############################################
 POST http://localhost:3000/api/moderator/shop/room
 Content-Type: application/json
-shop-id: 6460e5b32d30e05fec5f6319
+shop-id: 64623f3f54939d85ec8731a8
+# shop-id: 6460e5b32d30e05fec5f6319
 
 {
     "name": "room2"
+}
+
+############################################
+PUT http://localhost:3000/api/moderator/shop/update_info
+Content-Type: application/json
+shop-id: 6460e5b32d30e05fec5f6319
+
+{
+    "baseHourlyRate": 34
+}
+
+############################################
+PUT http://localhost:3000/api/moderator/shop/toggle_status
+Content-Type: application/json
+shop-id: 6460e5b32d30e05fec5f6319
+
+{
+    "isOpen": true 
+}
+
+############################################
+PUT http://localhost:3000/api/moderator/shop/room/6461011961203d108d76ba60/check_in
+Content-Type: application/json
+shop-id: 6460e5b32d30e05fec5f6319
+
+{
+
+}
+
+############################################
+PUT http://localhost:3000/api/moderator/shop/room/6461011961203d108d76ba60/check_out
+Content-Type: application/json
+shop-id: 6460e5b32d30e05fec5f6319
+
+{
+
 }

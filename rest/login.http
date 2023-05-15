@@ -18,6 +18,15 @@ Content-Type: application/json
 }
 
 ################################
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "userName": "The Rock",
+    "password": "123456"
+}
+
+################################
 GET http://localhost:3000/api/auth/logout
 
 

@@ -72,13 +72,12 @@ const shopSchema = mongoose.Schema({
       type: roomSchema,
     },
   ],
-  occupiedRooms: [
+  sessions: [
     {
-      roomID: {
+      roomId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Room",
         required: true,
-        unique: true,
       },
       roomName: {
         type: String,

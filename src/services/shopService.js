@@ -40,11 +40,20 @@ export const getShopById = async (id) => {
   }
 };
 
-export const updateShopById = async (id, update) => {
+export const getSessionByRoomId = (shop, roomId) => {
+  const session = shop.sessions.find(
+    (session) => `${session.roomId}` === `${roomId}`
+  );
+  return session;
+};
+
+export const updateShopById = async (id, update, options = { new: true }) => {
   try {
-    const updatedShop = await Shop.findByIdAndUpdate(id, update, {
-      new: true,
-    });
+    const updatedShop = await Shop.findOneAndUpdate(
+      { _id: id },
+      update,
+      options
+    );
     return updatedShop;
   } catch (error) {
     throw new Error(error);
