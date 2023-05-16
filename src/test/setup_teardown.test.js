@@ -17,6 +17,14 @@ before(async () => {
       userName: "globalTest",
       password: "test",
       name: "globalTest",
+      rooms: [
+        {
+          name: "room1",
+        },
+        {
+          name: "room2",
+        },
+      ],
     },
   };
   const res = {

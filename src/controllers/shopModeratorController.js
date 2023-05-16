@@ -4,9 +4,18 @@ const setNumVacancies = {
   $subtract: [{ $size: "$rooms" }, { $size: { $ifNull: ["$sessions", []] } }],
 };
 
+export const getShopInfo = async (req, res, next) => {
+  try {
+    const shop = await shopService.getShopById(req.shopId);
+    res.status(200).json(shop);
+  } catch (error) {
+    return next({ status: 400, message: error });
+  }
+};
+
 export const updateShopInfo = async (req, res, next) => {
   try {
-    const { location, baseHourlyRate, rooms, availableActivities, services } =
+    const { location, baseHourlyRate, availableActivities, services } =
       req.body;
     const updatedShop = await shopService.updateShopById(req.shopId, {
       location,
@@ -74,14 +83,18 @@ export const toggleStatus = async (req, res, next) => {
 export const checkInRoom = async (req, res, next) => {
   try {
     const roomId = req.params.room_id;
-    const { userId } = req.body;
     const shop = await shopService.getShopById(req.shopId);
     const session = shopService.getSessionByRoomId(shop, roomId);
     if (session) {
-      return next({
-        status: 400,
-        message: "Room is already occupied",
-      });
+      return next(
+        {
+          status: 400,
+          message: "Room is already occupied",
+        },
+        req,
+        res,
+        next
+      );
     }
     const updatedShop = await shopService.updateShopById(req.shopId, [
       {

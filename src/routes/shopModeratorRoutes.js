@@ -3,6 +3,8 @@ import * as shopModeratorController from "../controllers/shopModeratorController
 
 const router = express.Router();
 
+router.get("/", shopModeratorController.getShopInfo);
+
 router.put("/update_info", shopModeratorController.updateShopInfo);
 
 router.put("/toggle_status", shopModeratorController.toggleStatus);
