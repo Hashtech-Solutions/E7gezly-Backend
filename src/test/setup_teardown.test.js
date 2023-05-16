@@ -10,6 +10,7 @@ global.shopId = "";
 
 // Connect to a local test database before running any tests.
 before(async () => {
+  console.log("Running before all tests");
   const url = process.env.MONGO_TEST_URL;
   await mongoose.connect(url);
   const req = {

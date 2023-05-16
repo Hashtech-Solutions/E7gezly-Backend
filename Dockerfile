@@ -1,10 +1,8 @@
 # set the base image as the latest node image
-FROM node:latest
+FROM node:18-alpine
 
 # set the working directory
 WORKDIR /home/saif/fe-makan/backend 
-
-RUN pwd
 
 # copy the package.json file to the working directory
 COPY package*.json ./
