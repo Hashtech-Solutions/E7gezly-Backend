@@ -1,0 +1,25 @@
+name: Development
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: set up Docker
+        uses: docker/setup-docker@v1
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag my-image-name:latest
+
+      - name: Docker-compose
+        run: docker-compose up -d
+
+      - name: Run the npm run tests script on the Docker image
+        run: docker exec -it my-image-name npm run tests
