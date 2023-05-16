@@ -16,4 +16,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd server
-            echo "Pulling from development branch"
+            git pull origin development
+            docker build -t server .
+            docker compose-up -d
