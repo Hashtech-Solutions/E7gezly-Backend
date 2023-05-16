@@ -17,5 +17,5 @@ jobs:
           script: |
             cd server
             git pull origin development
-            docker build -t server .
-            docker compose-up -d
+            sudo docker build -t server .
+            sudo docker compose-up -d
