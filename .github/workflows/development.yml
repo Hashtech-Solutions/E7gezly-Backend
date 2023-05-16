@@ -17,3 +17,4 @@ jobs:
           script: |
             cd server
             git pull origin development
+            sudo docker build -t server .
