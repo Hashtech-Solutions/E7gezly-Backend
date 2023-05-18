@@ -38,6 +38,10 @@ const roomSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    enum: ["occupied", "available"],
+  },
   hourlyRate: {
     type: Number,
     required: false,

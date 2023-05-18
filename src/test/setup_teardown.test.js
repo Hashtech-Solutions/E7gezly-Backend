@@ -21,9 +21,11 @@ before(async () => {
       rooms: [
         {
           name: "room1",
+          status: "available",
         },
         {
           name: "room2",
+          status: "available",
         },
       ],
       availableActivities: ["ps4"],

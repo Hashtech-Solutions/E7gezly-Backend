@@ -1,8 +1,38 @@
+import { set } from "mongoose";
 import * as shopService from "../services/shopService.js";
 
 const setNumVacancies = {
-  $subtract: [{ $size: "$rooms" }, { $size: { $ifNull: ["$sessions", []] } }],
+  $size: {
+    $filter: {
+      input: "$rooms",
+      as: "room",
+      cond: {
+        $eq: ["$$room.status", "available"],
+      },
+    },
+  },
 };
+
+const setRoomStatus = (roomId, status) => ({
+  $map: {
+    input: "$rooms",
+    as: "room",
+    in: {
+      $cond: {
+        if: { $eq: ["$$room._id", roomId] },
+        then: {
+          $mergeObjects: [
+            "$$room",
+            {
+              status: status,
+            },
+          ],
+        },
+        else: "$$room",
+      },
+    },
+  },
+});
 
 export const getShopInfo = async (req, res, next) => {
   try {
@@ -37,6 +67,7 @@ export const addRoom = async (req, res, next) => {
       name,
       availableActivities,
       hourlyRate,
+      status: "available",
     });
     res.status(200).json(room);
   } catch (error) {
@@ -117,6 +148,11 @@ export const checkInRoom = async (req, res, next) => {
         },
       },
       {
+        $set: {
+          rooms: setRoomStatus(roomId, "occupied"),
+        },
+      },
+      {
         // set numVacancies to number of rooms minus number of sessions
         $set: {
           numVacancies: setNumVacancies,
@@ -145,6 +181,11 @@ export const checkOutRoom = async (req, res, next) => {
                 cond: { $ne: ["$$session.roomId", roomId] },
               },
             },
+          },
+        },
+        {
+          $set: {
+            rooms: setRoomStatus(roomId, "available"),
           },
         },
         {
