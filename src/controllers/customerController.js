@@ -4,7 +4,7 @@ export const getManyShops = async (req, res, next) => {
   try {
     const shops = await shopService.getManyShops(
       req.query,
-      "name numVacancies"
+      "name numVacancies availableActivities"
     );
     res.status(200).json(shops);
   } catch (error) {

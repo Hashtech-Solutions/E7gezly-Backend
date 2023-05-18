@@ -38,7 +38,7 @@ describe("shopModeratorController", () => {
     const req = {
       shopId: shopId,
       body: {
-        availableActivities: [{ name: "testActivity" }],
+        availableActivities: ["ps4"],
         hourlyRate: 10,
       },
       params: {

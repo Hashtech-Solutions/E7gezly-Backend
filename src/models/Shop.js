@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
 const locationSchema = mongoose.Schema({
-  longitude: {
+  long: {
     type: Number,
     required: true,
   },
-  latitude: {
+  lat: {
     type: Number,
     required: true,
   },
@@ -22,6 +22,11 @@ const activitiesSchema = mongoose.Schema({
   },
 });
 
+const activity = {
+  type: String,
+  enum: ["ps5", "ps4", "pc", "table tennis", "pool", "netflix"],
+};
+
 const roomSchema = mongoose.Schema({
   _id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -37,11 +42,7 @@ const roomSchema = mongoose.Schema({
     type: Number,
     required: false,
   },
-  availableActivities: [
-    {
-      type: activitiesSchema,
-    },
-  ],
+  availableActivities: [activity],
 });
 
 const shopSchema = mongoose.Schema({
@@ -113,11 +114,7 @@ const shopSchema = mongoose.Schema({
       },
     },
   ],
-  availableActivities: [
-    {
-      type: activitiesSchema,
-    },
-  ],
+  availableActivities: [activity],
 });
 
 // verify that roomNames are unique for the same shop

@@ -15,9 +15,10 @@ export const getShopInfo = async (req, res, next) => {
 
 export const updateShopInfo = async (req, res, next) => {
   try {
-    const { location, baseHourlyRate, availableActivities, services } =
+    const { name, location, baseHourlyRate, availableActivities, services } =
       req.body;
     const updatedShop = await shopService.updateShopById(req.shopId, {
+      name,
       location,
       baseHourlyRate,
       availableActivities,
@@ -31,7 +32,12 @@ export const updateShopInfo = async (req, res, next) => {
 
 export const addRoom = async (req, res, next) => {
   try {
-    const room = await shopService.addRoom(req.shopId, req.body);
+    const { name, availableActivities, hourlyRate } = req.body;
+    const room = await shopService.addRoom(req.shopId, {
+      name,
+      availableActivities,
+      hourlyRate,
+    });
     res.status(200).json(room);
   } catch (error) {
     return next({ status: 400, message: error }, req, res, next);
