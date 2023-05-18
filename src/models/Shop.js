@@ -11,7 +11,7 @@ const locationSchema = mongoose.Schema({
   },
 });
 
-const activitiesSchema = mongoose.Schema({
+const availableGamesSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -68,6 +68,7 @@ const shopSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
+  availableGames: [availableGamesSchema],
   rooms: [
     {
       type: roomSchema,
