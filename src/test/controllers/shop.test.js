@@ -58,7 +58,7 @@ describe("shopController", () => {
 
   it("should get all shops", async () => {
     const req = {
-      query: { name: "test" },
+      query: { availableActivities: "ps4" },
     };
     const res = {
       status: function (code) {

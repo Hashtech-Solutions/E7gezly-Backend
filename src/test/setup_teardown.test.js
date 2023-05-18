@@ -26,6 +26,7 @@ before(async () => {
           name: "room2",
         },
       ],
+      availableActivities: ["ps4"],
     },
   };
   const res = {
