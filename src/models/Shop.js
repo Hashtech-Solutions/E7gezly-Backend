@@ -104,6 +104,27 @@ const shopSchema = mongoose.Schema({
       },
     },
   ],
+  reservations: [
+    {
+      roomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Room",
+        required: true,
+      },
+      roomName: {
+        type: String,
+        required: true,
+      },
+      startTime: {
+        type: Date,
+        required: true,
+      },
+      endTime: {
+        type: Date,
+        required: true,
+      },
+    },
+  ],
   numVacancies: {
     type: Number,
   },

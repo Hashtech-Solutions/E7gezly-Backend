@@ -34,6 +34,12 @@ const setRoomStatus = (roomId, status) => ({
   },
 });
 
+const getEndDate = (startTime, durationInHrs) => {
+  const endTime = new Date(startTime);
+  endTime.setHours(endTime.getHours() + durationInHrs);
+  return endTime;
+};
+
 export const getShopInfo = async (req, res, next) => {
   try {
     const shop = await shopService.getShopById(req.shopId);

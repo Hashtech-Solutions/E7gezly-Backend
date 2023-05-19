@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import User from "../models/User.js";
+import Shop from "../models/Shop.js";
 import * as shopAdminController from "../controllers/shopAdminController.js";
 import errorHandler from "../middleware/errorHandler.js";
 
@@ -7,6 +9,7 @@ dotenv.config();
 
 // have shopId as global variable to use in all tests
 global.shopId = "";
+global.customerId = "";
 
 // Connect to a local test database before running any tests.
 before(async () => {
@@ -43,6 +46,12 @@ before(async () => {
   };
   const shop = await shopAdminController.createShop(req, res, errorHandler);
   global.shopId = res.data._id;
+  const customer = await User.create({
+    userName: "customer",
+    password: "test",
+    role: "customer",
+  });
+  global.customerId = customer._id;
 });
 
 // Drop database after all tests are done.
