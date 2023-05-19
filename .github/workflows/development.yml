@@ -1,20 +1,20 @@
-name: Development
-on:
-  push:
-    branches:
-      - development
+# name: Development
+# on:
+#   push:
+#     branches:
+#       - development
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd server
-            git pull origin development
-            sudo docker compose up -d --build
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.SSH_HOST }}
+#           username: ${{ secrets.SSH_USERNAME }}
+#           key: ${{ secrets.SSH_KEY }}
+#           script: |
+#             cd server
+#             git pull origin development
+#             sudo docker compose up -d --build
