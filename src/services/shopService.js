@@ -71,6 +71,25 @@ export const addRoom = async (id, room) => {
   }
 };
 
+export const reserveRoom = async (id, roomId, reservation) => {
+  try {
+    const shop = await Shop.findById(id);
+    const room = shop.rooms.find((room) => `${room._id}` === `${roomId}`);
+    const existingReservation = room.reservations.filter(
+      (r) =>
+        r.startTime <= reservation.endTime && r.endTime >= reservation.startTime
+    );
+    if (existingReservation.length > 0) {
+      throw new Error("Room is already reserved");
+    }
+    room.reservations.push(reservation);
+    await shop.save();
+    return shop.rooms.find((room) => `${room._id}` === `${roomId}`);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const deleteShopById = async (id) => {
   try {
     const deletedShop = await Shop.findByIdAndDelete(id);

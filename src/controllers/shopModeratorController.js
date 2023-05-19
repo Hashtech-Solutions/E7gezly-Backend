@@ -1,7 +1,43 @@
+import { set } from "mongoose";
 import * as shopService from "../services/shopService.js";
 
 const setNumVacancies = {
-  $subtract: [{ $size: "$rooms" }, { $size: { $ifNull: ["$sessions", []] } }],
+  $size: {
+    $filter: {
+      input: "$rooms",
+      as: "room",
+      cond: {
+        $eq: ["$$room.status", "available"],
+      },
+    },
+  },
+};
+
+const setRoomStatus = (roomId, status) => ({
+  $map: {
+    input: "$rooms",
+    as: "room",
+    in: {
+      $cond: {
+        if: { $eq: ["$$room._id", roomId] },
+        then: {
+          $mergeObjects: [
+            "$$room",
+            {
+              status: status,
+            },
+          ],
+        },
+        else: "$$room",
+      },
+    },
+  },
+});
+
+const getEndDate = (startTime, durationInHrs) => {
+  const endTime = new Date(startTime);
+  endTime.setHours(endTime.getHours() + durationInHrs);
+  return endTime;
 };
 
 export const getShopInfo = async (req, res, next) => {
@@ -15,9 +51,10 @@ export const getShopInfo = async (req, res, next) => {
 
 export const updateShopInfo = async (req, res, next) => {
   try {
-    const { location, baseHourlyRate, availableActivities, services } =
+    const { name, location, baseHourlyRate, availableActivities, services } =
       req.body;
     const updatedShop = await shopService.updateShopById(req.shopId, {
+      name,
       location,
       baseHourlyRate,
       availableActivities,
@@ -31,7 +68,13 @@ export const updateShopInfo = async (req, res, next) => {
 
 export const addRoom = async (req, res, next) => {
   try {
-    const room = await shopService.addRoom(req.shopId, req.body);
+    const { name, availableActivities, hourlyRate } = req.body;
+    const room = await shopService.addRoom(req.shopId, {
+      name,
+      availableActivities,
+      hourlyRate,
+      status: "available",
+    });
     res.status(200).json(room);
   } catch (error) {
     return next({ status: 400, message: error }, req, res, next);
@@ -111,6 +154,11 @@ export const checkInRoom = async (req, res, next) => {
         },
       },
       {
+        $set: {
+          rooms: setRoomStatus(roomId, "occupied"),
+        },
+      },
+      {
         // set numVacancies to number of rooms minus number of sessions
         $set: {
           numVacancies: setNumVacancies,
@@ -139,6 +187,11 @@ export const checkOutRoom = async (req, res, next) => {
                 cond: { $ne: ["$$session.roomId", roomId] },
               },
             },
+          },
+        },
+        {
+          $set: {
+            rooms: setRoomStatus(roomId, "available"),
           },
         },
         {

@@ -1,6 +1,7 @@
 import express, { application } from "express";
 import connectDB from "./config/database.js";
 import dotenv from "dotenv";
+import cors from "cors";
 import errorHandler from "./middleware/errorHandler.js";
 import router from "./routes/index.js";
 import session from "express-session";
@@ -10,6 +11,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.use(
   session({

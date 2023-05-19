@@ -1,17 +1,17 @@
 import mongoose from "mongoose";
 
 const locationSchema = mongoose.Schema({
-  longitude: {
+  long: {
     type: Number,
     required: true,
   },
-  latitude: {
+  lat: {
     type: Number,
     required: true,
   },
 });
 
-const activitiesSchema = mongoose.Schema({
+const availableGamesSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -21,6 +21,11 @@ const activitiesSchema = mongoose.Schema({
     required: false,
   },
 });
+
+const activity = {
+  type: String,
+  enum: ["ps5", "ps4", "pc", "table tennis", "pool", "netflix"],
+};
 
 const roomSchema = mongoose.Schema({
   _id: {
@@ -33,15 +38,15 @@ const roomSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    enum: ["occupied", "available"],
+  },
   hourlyRate: {
     type: Number,
     required: false,
   },
-  availableActivities: [
-    {
-      type: activitiesSchema,
-    },
-  ],
+  availableActivities: [activity],
 });
 
 const shopSchema = mongoose.Schema({
@@ -67,6 +72,7 @@ const shopSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
+  availableGames: [availableGamesSchema],
   rooms: [
     {
       type: roomSchema,
@@ -98,6 +104,27 @@ const shopSchema = mongoose.Schema({
       },
     },
   ],
+  reservations: [
+    {
+      roomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Room",
+        required: true,
+      },
+      roomName: {
+        type: String,
+        required: true,
+      },
+      startTime: {
+        type: Date,
+        required: true,
+      },
+      endTime: {
+        type: Date,
+        required: true,
+      },
+    },
+  ],
   numVacancies: {
     type: Number,
   },
@@ -113,11 +140,7 @@ const shopSchema = mongoose.Schema({
       },
     },
   ],
-  availableActivities: [
-    {
-      type: activitiesSchema,
-    },
-  ],
+  availableActivities: [activity],
 });
 
 // verify that roomNames are unique for the same shop
