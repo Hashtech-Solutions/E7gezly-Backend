@@ -11,7 +11,7 @@
 - Header: shop_id
 - GET /moderator/shop - get shop
 - PUT /moderator/update_info - update shop info ()
-  - body: {name?: string, location?: {lat: number, lng: number}, baseHourlyRate?: number, availableActivities?: string[], availableServices?: {name: string, price: number}[]}
+  - body: {name?: string, location?: {lat: number, lng: number}, baseHourlyRate?: number, availableServices?: string[], availableGames?: {name: string, image: string}[]}
 - PUT /moderator/toggle_status - toggle shop status (body: {})
 - POST /moderator/add_room - add room
   - body: {name: string, availableActivities?: string[], hourlyRate?: number}

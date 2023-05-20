@@ -24,7 +24,6 @@ export const updateShopInfo = Joi.object({
       image: Joi.string(),
     })
   ),
-  baseHourlyRate: Joi.number(),
   //   validate activities in shopEnums.activities
   availableServices: Joi.array().items(
     Joi.string().valid(...enums.shopEnums.services)
