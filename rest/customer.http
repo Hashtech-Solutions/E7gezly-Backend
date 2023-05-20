@@ -1,2 +1,13 @@
 
 GET http://localhost:3000/api/customer/shop
+
+#######################
+
+POST http://localhost:3000/api/customer/shop/6460e5b32d30e05fec5f6319/book_room
+Content-Type: application/json
+
+{
+    "roomId": "6461011961203d108d76ba60",
+    "startTime": "2019-12-12T52:00:00.000Z",
+    "endTime": "2019-12-13T05:53:00.000Z"
+}

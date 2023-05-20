@@ -39,3 +39,13 @@ Content-Type: application/json
     "password": "password",
     "role": "customer"
 }
+
+################################
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "userName": "Darwin",
+    "password": "password"
+}
+

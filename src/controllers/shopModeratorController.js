@@ -1,5 +1,6 @@
 import { set } from "mongoose";
 import * as shopService from "../services/shopService.js";
+import * as reservationService from "../services/reservationService.js";
 
 const setNumVacancies = {
   $size: {
@@ -33,12 +34,6 @@ const setRoomStatus = (roomId, status) => ({
     },
   },
 });
-
-const getEndDate = (startTime, durationInHrs) => {
-  const endTime = new Date(startTime);
-  endTime.setHours(endTime.getHours() + durationInHrs);
-  return endTime;
-};
 
 export const getShopInfo = async (req, res, next) => {
   try {
@@ -104,18 +99,6 @@ export const toggleStatus = async (req, res, next) => {
     const { isOpen } = req.body;
     const updatedShop = await shopService.updateShopById(req.shopId, [
       { $set: { isOpen } },
-      // set numVacancies to capacity of all rooms if open and 0 if closed
-      // {
-      //   $set: {
-      //     numVacancies: {
-      //       $cond: {
-      //         if: { $eq: ["$isOpen", true] },
-      //         then: { $size: "$rooms" },
-      //         else: 0,
-      //       },
-      //     },
-      //   },
-      // },
     ]);
     res.status(200).json(updatedShop);
   } catch (error) {
@@ -125,7 +108,7 @@ export const toggleStatus = async (req, res, next) => {
 
 export const checkInRoom = async (req, res, next) => {
   try {
-    const roomId = req.params.room_id;
+    const { roomId } = req.body;
     const shop = await shopService.getShopById(req.shopId);
     const session = shopService.getSessionByRoomId(shop, roomId);
     if (session) {
@@ -173,7 +156,7 @@ export const checkInRoom = async (req, res, next) => {
 
 export const checkOutRoom = async (req, res, next) => {
   try {
-    const roomId = req.params.room_id;
+    const { roomId } = req.body;
     const updatedShop = await shopService.updateShopById(
       req.shopId,
       // increment numVacancies if <= capacity
@@ -202,6 +185,23 @@ export const checkOutRoom = async (req, res, next) => {
       ]
     );
     res.status(200).json(updatedShop);
+  } catch (error) {
+    return next({ status: 400, message: error }, req, res, next);
+  }
+};
+
+export const bookRoom = async (req, res, next) => {
+  try {
+    const shopId = req.shopId;
+    const { roomId, startTime, endTime, userId } = req.body;
+    const reservation = await reservationService.createReservation({
+      shopId,
+      roomId,
+      startTime,
+      endTime,
+      userId,
+    });
+    res.status(200).json(reservation);
   } catch (error) {
     return next({ status: 400, message: error }, req, res, next);
   }

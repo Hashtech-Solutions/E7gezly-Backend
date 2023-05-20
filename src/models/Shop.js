@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import * as enums from "./enums.js";
 
 const locationSchema = mongoose.Schema({
   long: {
@@ -11,7 +12,7 @@ const locationSchema = mongoose.Schema({
   },
 });
 
-const availableGamesSchema = mongoose.Schema({
+const gamesSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -22,17 +23,18 @@ const availableGamesSchema = mongoose.Schema({
   },
 });
 
-const activity = {
-  type: String,
-  enum: ["ps5", "ps4", "pc", "table tennis", "pool", "netflix"],
-};
-
 const roomSchema = mongoose.Schema({
   _id: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     // auto-generate a new ObjectId
     default: () => new mongoose.Types.ObjectId(),
+    unique: true,
+  },
+  games: [gamesSchema],
+  roomType: {
+    type: String,
+    enum: enums.shopEnums.roomTypes,
   },
   name: {
     type: String,
@@ -46,7 +48,11 @@ const roomSchema = mongoose.Schema({
     type: Number,
     required: false,
   },
-  availableActivities: [activity],
+  capacity: {
+    type: Number,
+    required: false,
+  },
+  availableServices: [enums.shopEnums.services],
 });
 
 const shopSchema = mongoose.Schema({
@@ -55,6 +61,7 @@ const shopSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
+
   isOpen: {
     type: Boolean,
     required: true,
@@ -72,7 +79,7 @@ const shopSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
-  availableGames: [availableGamesSchema],
+  availableGames: [gamesSchema],
   rooms: [
     {
       type: roomSchema,
@@ -97,50 +104,29 @@ const shopSchema = mongoose.Schema({
         type: Date,
         required: false,
       },
-      customer: {
+      userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: false,
       },
     },
   ],
-  reservations: [
-    {
-      roomId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Room",
-        required: true,
-      },
-      roomName: {
-        type: String,
-        required: true,
-      },
-      startTime: {
-        type: Date,
-        required: true,
-      },
-      endTime: {
-        type: Date,
-        required: true,
-      },
-    },
-  ],
   numVacancies: {
     type: Number,
   },
-  services: [
+  extras: [
     {
       name: {
         type: String,
         required: true,
       },
-      extraRate: {
+      price: {
         type: Number,
         required: true,
       },
     },
   ],
-  availableActivities: [activity],
+  availableActivities: [enums.shopEnums.activities],
 });
 
 // verify that roomNames are unique for the same shop
