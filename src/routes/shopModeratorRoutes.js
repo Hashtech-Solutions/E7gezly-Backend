@@ -1,5 +1,6 @@
 import express from "express";
 import * as shopModeratorController from "../controllers/shopModeratorController.js";
+import validateDate from "../middleware/validateDate.js";
 
 const router = express.Router();
 
@@ -13,8 +14,8 @@ router.post("/room", shopModeratorController.addRoom);
 
 router.put("/room/:room_id", shopModeratorController.updateRoom);
 
-router.put("/room/:room_id/check_in", shopModeratorController.checkInRoom);
+router.put("/check_in", validateDate, shopModeratorController.checkInRoom);
 
-router.put("/room/:room_id/check_out", shopModeratorController.checkOutRoom);
+router.put("/check_out", shopModeratorController.checkOutRoom);
 
 export default router;

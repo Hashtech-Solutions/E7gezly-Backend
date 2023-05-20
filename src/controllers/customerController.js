@@ -1,4 +1,5 @@
 import * as shopService from "../services/shopService.js";
+import * as reservationService from "../services/reservationService.js";
 
 export const getManyShops = async (req, res, next) => {
   try {
@@ -19,18 +20,31 @@ export const getManyShops = async (req, res, next) => {
   }
 };
 
-export const reserveRoom = async (req, res, next) => {
+export const bookRoom = async (req, res, next) => {
   try {
-    const { roomId, startTime, endTime } = req.body;
+    let { roomId, startTime, endTime } = req.body;
     const userId = req.user._id;
     const shopId = req.params.shop_id;
-    const room = await shopService.reserveRoom(shopId, roomId, {
+    const reservation = await reservationService.createReservation({
       startTime,
       endTime,
       userId,
+      shopId,
       roomId,
     });
-    res.status(200).json(room);
+    res.status(200).json(reservation);
+  } catch (error) {
+    return next({ status: 400, message: error }, req, res, next);
+  }
+};
+
+export const getCustomerReservations = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const reservations = await reservationService.getManyReservations({
+      userId,
+    });
+    res.status(200).json(reservations);
   } catch (error) {
     return next({ status: 400, message: error });
   }

@@ -66,8 +66,8 @@ describe("shopModeratorController", () => {
   it("should check in test room", async () => {
     const req = {
       shopId: shopId,
-      params: {
-        room_id: roomId,
+      body: {
+        roomId,
       },
     };
     const res = {
@@ -93,8 +93,8 @@ describe("shopModeratorController", () => {
   it("should check out test room", async () => {
     const req = {
       shopId: shopId,
-      params: {
-        room_id: roomId,
+      body: {
+        roomId,
       },
     };
     const res = {

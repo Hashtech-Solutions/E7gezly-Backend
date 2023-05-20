@@ -10,6 +10,8 @@ dotenv.config();
 // have shopId as global variable to use in all tests
 global.shopId = "";
 global.customerId = "";
+global.room1Id = "";
+global.room2Id = "";
 
 // Connect to a local test database before running any tests.
 before(async () => {
@@ -46,6 +48,8 @@ before(async () => {
   };
   const shop = await shopAdminController.createShop(req, res, errorHandler);
   global.shopId = res.data._id;
+  global.room1Id = res.data.rooms[0]._id;
+  global.room2Id = res.data.rooms[1]._id;
   const customer = await User.create({
     userName: "customer",
     password: "test",

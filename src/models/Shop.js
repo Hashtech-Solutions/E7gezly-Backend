@@ -22,6 +22,22 @@ const availableGamesSchema = mongoose.Schema({
   },
 });
 
+const reservationSchema = mongoose.Schema({
+  startTime: {
+    type: Date,
+    required: true,
+  },
+  endTime: {
+    type: Date,
+    required: true,
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
+  },
+});
+
 const activity = {
   type: String,
   enum: ["ps5", "ps4", "pc", "table tennis", "pool", "netflix"],
@@ -33,6 +49,7 @@ const roomSchema = mongoose.Schema({
     required: true,
     // auto-generate a new ObjectId
     default: () => new mongoose.Types.ObjectId(),
+    unique: true,
   },
   name: {
     type: String,
@@ -43,6 +60,11 @@ const roomSchema = mongoose.Schema({
     enum: ["occupied", "available"],
   },
   hourlyRate: {
+    type: Number,
+    required: false,
+  },
+  reservations: [reservationSchema],
+  capacity: {
     type: Number,
     required: false,
   },
@@ -97,31 +119,10 @@ const shopSchema = mongoose.Schema({
         type: Date,
         required: false,
       },
-      customer: {
+      userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: false,
-      },
-    },
-  ],
-  reservations: [
-    {
-      roomId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Room",
-        required: true,
-      },
-      roomName: {
-        type: String,
-        required: true,
-      },
-      startTime: {
-        type: Date,
-        required: true,
-      },
-      endTime: {
-        type: Date,
-        required: true,
       },
     },
   ],
