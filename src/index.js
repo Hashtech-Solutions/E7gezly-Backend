@@ -26,9 +26,9 @@ app.use(
     saveUninitialized: false,
     // should be changed in production
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === "local" ? false : true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
-      httpOnly: false,
+      httpOnly: process.env.NODE_ENV === "local" ? false : true,
       sameSite: "none",
     },
   })
