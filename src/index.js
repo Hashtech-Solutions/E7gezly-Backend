@@ -10,6 +10,7 @@ import passport from "passport";
 dotenv.config();
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(
   cors({
@@ -23,6 +24,13 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    // should be changed in production
+    cookie: {
+      secure: false,
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      httpOnly: false,
+      sameSite: "none",
+    },
   })
 );
 
