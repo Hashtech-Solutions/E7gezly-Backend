@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/shop", customerController.getManyShops);
 
-router.get("/shop/:shop_id", customerController.getOneShop);
+router.get("/shop/:shop_id", customerController.getShopById);
 
 router.post(
   "/shop/:shop_id/book_room",

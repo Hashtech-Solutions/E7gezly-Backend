@@ -7,6 +7,9 @@ Content-Type: application/json
     "name": "العالمي"
 }
 
+############################
+GET http://localhost:3000/api/shop_moderator/shop_info
+
 ############################################
 DELETE http://localhost:3000/api/admin/shop/646a0c7d6490a432b7544256
 
