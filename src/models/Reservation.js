@@ -8,7 +8,7 @@ const reservationSchema = mongoose.Schema({
     index: true,
   },
   roomId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: "Room",
     required: true,
     index: true,

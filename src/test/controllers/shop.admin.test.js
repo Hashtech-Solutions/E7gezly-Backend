@@ -2,7 +2,7 @@ import { expect } from "chai";
 import * as shopAdminController from "../../controllers/shopAdminController.js";
 import errorHandler from "../../middleware/errorHandler.js";
 
-describe("shopModeratorController", () => {
+describe("shop admin tests", () => {
   let roomId;
   let numVacancies;
   it("should add room to shop", async () => {

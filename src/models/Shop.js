@@ -25,10 +25,13 @@ const gamesSchema = mongoose.Schema({
 
 const roomSchema = mongoose.Schema({
   _id: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     required: true,
-    // auto-generate a new ObjectId
-    default: () => new mongoose.Types.ObjectId(),
+    default: function () {
+      const newId = new mongoose.Types.ObjectId();
+      const shopId = this.$__parent._id;
+      return `${shopId}-${newId}`;
+    },
   },
   games: [gamesSchema],
   roomType: {
@@ -100,7 +103,7 @@ const shopSchema = mongoose.Schema({
   sessions: [
     {
       roomId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: "Room",
         required: true,
       },
