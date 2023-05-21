@@ -29,4 +29,6 @@
 ## Customer
 
 - GET /customer/shop?optionalQuery=value - get all shops
+- GET /customer/shop/:id - get shop by id
 - POST /customer/shop/:shop_id/book_room - book room (body: {room_id: string, startTime: string, endTime: string})
+- GET /customer/shop/reservation - get all reservations

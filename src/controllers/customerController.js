@@ -38,6 +38,15 @@ export const bookRoom = async (req, res, next) => {
   }
 };
 
+export const getShopById = async (req, res, next) => {
+  try {
+    const shop = await shopService.getShopById(req.params.id);
+    res.status(200).json(shop);
+  } catch (error) {
+    return next({ status: 400, message: error });
+  }
+};
+
 export const getCustomerReservations = async (req, res, next) => {
   try {
     const userId = req.user._id;
