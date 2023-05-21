@@ -1,9 +1,8 @@
 import { expect } from "chai";
 import * as shopAdminController from "../../controllers/shopAdminController.js";
-import * as shopModeratorController from "../../controllers/shopModeratorController.js";
 import errorHandler from "../../middleware/errorHandler.js";
 
-describe("shopModeratorController", () => {
+describe("shop admin tests", () => {
   let roomId;
   let numVacancies;
   it("should add room to shop", async () => {
@@ -24,12 +23,12 @@ describe("shopModeratorController", () => {
         return this;
       },
     };
-    const room = await shopModeratorController.addRoom(req, res, errorHandler);
+    const room = await shopAdminController.addRoom(req, res, errorHandler);
     roomId = res.data.rooms.find((room) => room.name === "test")._id;
     expect(res.statusCode).to.equal(200);
     expect(res.data).to.be.an("object");
     // shouldn't add room with non-unqiue name
-    const room2 = await shopModeratorController.addRoom(req, res, errorHandler);
+    const room2 = await shopAdminController.addRoom(req, res, errorHandler);
     expect(res.statusCode).to.equal(400);
     expect(res.data).to.be.an("object");
   });
@@ -55,7 +54,7 @@ describe("shopModeratorController", () => {
         return this;
       },
     };
-    await shopModeratorController.updateRoom(req, res, errorHandler);
+    await shopAdminController.updateRoom(req, res, errorHandler);
     const updatedRoom = res.data.rooms.find(
       (room) => `${room._id}` === `${roomId}`
     );
@@ -80,13 +79,13 @@ describe("shopModeratorController", () => {
         return this;
       },
     };
-    await shopModeratorController.checkInRoom(req, res, errorHandler);
+    await shopAdminController.checkInRoom(req, res, errorHandler);
     numVacancies = res.data.numVacancies;
     expect(res.statusCode).to.equal(200);
     expect(
       res.data.sessions.find((session) => `${session.roomId}` === `${roomId}`)
     ).to.be.an("object");
-    await shopModeratorController.checkInRoom(req, res, errorHandler);
+    await shopAdminController.checkInRoom(req, res, errorHandler);
     expect(res.statusCode).to.equal(400);
   });
 
@@ -107,11 +106,34 @@ describe("shopModeratorController", () => {
         return this;
       },
     };
-    await shopModeratorController.checkOutRoom(req, res, errorHandler);
+    await shopAdminController.checkOutRoom(req, res, errorHandler);
     expect(res.statusCode).to.equal(200);
     expect(res.data.numVacancies).to.equal(numVacancies + 1);
     expect(
       res.data.sessions.find((session) => `${session.roomId}` === `${roomId}`)
     ).to.be.undefined;
+  });
+
+  it("should create shop moderator", async () => {
+    const req = {
+      shopId: shopId,
+      body: {
+        userName: "testModerator",
+        password: "password123",
+      },
+    };
+    const res = {
+      status: function (code) {
+        this.statusCode = code;
+        return this;
+      },
+      json: function (data) {
+        this.data = data;
+        return this;
+      },
+    };
+    await shopAdminController.createShopModerator(req, res, errorHandler);
+    expect(res.statusCode).to.equal(200);
+    expect(res.data).to.be.an("object");
   });
 });

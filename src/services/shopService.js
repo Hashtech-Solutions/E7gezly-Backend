@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Shop from "../models/Shop.js";
+import mongoose from "mongoose";
 
 export const createShop = async (shop, shopModerator) => {
   let shopModeratorId;
@@ -8,7 +9,7 @@ export const createShop = async (shop, shopModerator) => {
     const newShop = new Shop({
       ...shop,
       isOpen: false,
-      moderator: newShopModerator._id,
+      shopAdminId: newShopModerator._id,
     });
     newShopModerator.shopId = newShop._id;
     shopModeratorId = newShopModerator._id;
@@ -18,6 +19,67 @@ export const createShop = async (shop, shopModerator) => {
   } catch (error) {
     // delete the shop moderator if the shop creation fails
     await User.findByIdAndDelete(shopModeratorId);
+    throw new Error(error);
+  }
+};
+
+export const createShopModerator = async (shopModerator) => {
+  let session;
+  try {
+    session = await mongoose.startSession();
+    session.startTransaction();
+    const shopModeratorUser = new User(shopModerator);
+    const createdShopModerator = await shopModeratorUser.save({
+      session: session,
+    });
+
+    await Shop.findByIdAndUpdate(
+      shopModerator.shopId,
+      {
+        $push: {
+          shopModerators: {
+            _id: createdShopModerator._id,
+            userName: createdShopModerator.userName,
+          },
+        },
+      },
+      { session: session, new: true }
+    );
+    await session.commitTransaction();
+    session.endSession();
+    return createdShopModerator;
+  } catch (error) {
+    session.abortTransaction();
+    session.endSession();
+    throw new Error(error);
+  }
+};
+
+export const removeShopModerator = async (shopModeratorId) => {
+  let session;
+  try {
+    session = await mongoose.startSession();
+    session.startTransaction();
+    const shopModerator = await User.findByIdAndDelete(shopModeratorId, {
+      session: session,
+    });
+    await Shop.findByIdAndUpdate(
+      shopModerator.shopId,
+      {
+        $pull: {
+          shopModerators: {
+            _id: shopModeratorId,
+          },
+        },
+      },
+      { session: session, new: true }
+    );
+    await session.commitTransaction();
+    session.endSession();
+    return shopModerator;
+  } catch (error) {
+    session.abortTransaction();
+    session.endSession();
     throw new Error(error);
   }
 };
@@ -66,25 +128,6 @@ export const addRoom = async (id, room) => {
     shop.rooms.push(room);
     await shop.save();
     return shop;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-export const reserveRoom = async (id, roomId, reservation) => {
-  try {
-    const shop = await Shop.findById(id);
-    const room = shop.rooms.find((room) => `${room._id}` === `${roomId}`);
-    const existingReservation = room.reservations.filter(
-      (r) =>
-        r.startTime <= reservation.endTime && r.endTime >= reservation.startTime
-    );
-    if (existingReservation.length > 0) {
-      throw new Error("Room is already reserved");
-    }
-    room.reservations.push(reservation);
-    await shop.save();
-    return shop.rooms.find((room) => `${room._id}` === `${roomId}`);
   } catch (error) {
     throw new Error(error);
   }
