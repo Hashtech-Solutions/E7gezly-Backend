@@ -2,23 +2,23 @@ import User from "../models/User.js";
 import Shop from "../models/Shop.js";
 import mongoose from "mongoose";
 
-export const createShop = async (shop, shopModerator) => {
-  let shopModeratorId;
+export const createShop = async (shop, shopAdmin) => {
+  let shopAdminId;
   try {
-    let newShopModerator = new User(shopModerator);
+    let newShopAdmin = new User(shopAdmin);
     const newShop = new Shop({
       ...shop,
       isOpen: false,
-      shopAdminId: newShopModerator._id,
+      shopAdminId: newShopAdmin._id,
     });
-    newShopModerator.shopId = newShop._id;
-    shopModeratorId = newShopModerator._id;
-    await newShopModerator.save();
+    newShopAdmin.shopId = newShop._id;
+    shopAdminId = newShopAdmin._id;
+    await newShopAdmin.save();
     const createdShop = await newShop.save();
     return createdShop;
   } catch (error) {
     // delete the shop moderator if the shop creation fails
-    await User.findByIdAndDelete(shopModeratorId);
+    await User.findByIdAndDelete(shopAdminId);
     throw new Error(error);
   }
 };
@@ -125,6 +125,9 @@ export const updateShopById = async (id, update, options = { new: true }) => {
 export const addRoom = async (id, room) => {
   try {
     const shop = await Shop.findById(id);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
     shop.rooms.push(room);
     await shop.save();
     return shop;
