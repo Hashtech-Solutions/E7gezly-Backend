@@ -64,10 +64,10 @@ export const updateShopInfo = async (req, res, next) => {
 
 export const createShopModerator = async (req, res, next) => {
   try {
-    let { userName, password } = req.body;
+    let { password } = req.body;
     password = await bcrypt.hash(password, 10);
     const shopModerator = await shopService.createShopModerator({
-      userName,
+      ...req.body,
       password,
       role: "shopModerator",
       shopId: req.shopId,
@@ -92,11 +92,8 @@ export const removeShopModerator = async (req, res, next) => {
 
 export const addRoom = async (req, res, next) => {
   try {
-    const { name, availableActivities, hourlyRate } = req.body;
     const room = await shopService.addRoom(req.shopId, {
-      name,
-      availableActivities,
-      hourlyRate,
+      ...req.body,
       status: "available",
     });
     res.status(200).json(room);
@@ -107,13 +104,15 @@ export const addRoom = async (req, res, next) => {
 
 export const updateRoom = async (req, res, next) => {
   try {
-    const { availableActivities, hourlyRate } = req.body;
     const roomId = req.params.room_id;
     const updatedShop = await shopService.updateShopById(
       req.shopId,
       {
-        "rooms.$[elem].availableActivities": availableActivities,
-        "rooms.$[elem].hourlyRate": hourlyRate,
+        // set room to req.body
+        "rooms.$[elem]": {
+          ...req.body,
+          _id: roomId,
+        },
       },
       { arrayFilters: [{ "elem._id": roomId }], new: true }
     );

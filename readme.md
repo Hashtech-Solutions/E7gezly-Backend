@@ -10,7 +10,7 @@
 
 - Header: shop_id
 - PUT /shop_admin/update_info - update shop info ()
-  - body: {name?: string, location?: {lat: number, lng: number}, baseHourlyRate?: number, availableServices?: string[], availableGames?: {name: string, image: string}[]}
+  - body: {name?: string, location?: {lat: number, lng: number}, baseHourlyRate?: number, availableServices?: string[], games?: {name: string, image: string}[]}
 - POST /shop_admin/add_room - add room
   - body: {name: string, availableActivities?: string[], hourlyRate?: number}
 - POST /shop_admin/moderator - add moderator
