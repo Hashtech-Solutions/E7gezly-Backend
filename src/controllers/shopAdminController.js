@@ -47,15 +47,7 @@ export const getShopInfo = async (req, res, next) => {
 
 export const updateShopInfo = async (req, res, next) => {
   try {
-    const { name, location, baseHourlyRate, availableActivities, services } =
-      req.body;
-    const updatedShop = await shopService.updateShopById(req.shopId, {
-      name,
-      location,
-      baseHourlyRate,
-      availableActivities,
-      services,
-    });
+    const updatedShop = await shopService.updateShopById(req.shopId, req.body);
     res.status(200).json(updatedShop);
   } catch (error) {
     return next({ status: 400, message: error });
