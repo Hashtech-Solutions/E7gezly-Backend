@@ -12,6 +12,7 @@ dotenv.config();
 const app = express();
 app.set("trust proxy", 1);
 app.use(express.json());
+// should be changed in production
 app.use(
   cors({
     origin: true,

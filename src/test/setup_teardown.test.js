@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import User from "../models/User.js";
 import Shop from "../models/Shop.js";
-import * as shopAdminController from "../controllers/shopAdminController.js";
 import errorHandler from "../middleware/errorHandler.js";
+import * as adminController from "../controllers/adminController.js";
 
 dotenv.config();
 
@@ -46,7 +46,7 @@ before(async () => {
       return this;
     },
   };
-  const shop = await shopAdminController.createShop(req, res, errorHandler);
+  const shop = await adminController.createShop(req, res, errorHandler);
   global.shopId = res.data._id;
   global.room1Id = res.data.rooms[0]._id;
   global.room2Id = res.data.rooms[1]._id;

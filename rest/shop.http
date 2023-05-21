@@ -1,12 +1,14 @@
 POST http://localhost:3000/api/admin/shop
 Content-Type: application/json
-shopId: test
 
 {
     "userName": "The Rock",
-    "password": "123456",
-    "name": "Powerstation"
+    "password": "12345678",
+    "name": "العالمي"
 }
+
+############################################
+DELETE http://localhost:3000/api/admin/shop/646a0c7d6490a432b7544256
 
 ############################################
 GET http://localhost:3000/api/admin/shop

@@ -8,7 +8,12 @@ export const shopSchema = Joi.object({
     long: Joi.number().required(),
     lat: Joi.number().required(),
   }),
-  password: Joi.string().required(),
+  password: Joi.string().min(8).required(),
+});
+
+export const shopModeratorSchema = Joi.object({
+  userName: Joi.string().required(),
+  password: Joi.string().min(8).required(),
 });
 
 export const updateShopInfo = Joi.object({

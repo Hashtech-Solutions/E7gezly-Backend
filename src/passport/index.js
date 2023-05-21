@@ -83,11 +83,21 @@ passport.authorize = (role) => {
       return next();
     }
 
-    if (req.user.role !== role) {
+    if (
+      (role === "shopModerator" || role === "shopAdmin") &&
+      req.user.shopId != req.shopId
+    ) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    if (role === "shopModerator" && req.user.shopId != req.shopId) {
+    if (
+      req.user.role === "shopAdmin" &&
+      (role === "shopModerator" || role === "shopAdmin")
+    ) {
+      return next();
+    }
+
+    if (req.user.role !== role) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 

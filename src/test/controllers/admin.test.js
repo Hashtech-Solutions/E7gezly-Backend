@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import * as shopAdminController from "../../controllers/shopAdminController.js";
 import * as customerController from "../../controllers/customerController.js";
 import errorHandler from "../../middleware/errorHandler.js";
+import * as adminController from "../../controllers/adminController.js";
 
 describe("shopController", () => {
   let shopId;
@@ -24,7 +24,7 @@ describe("shopController", () => {
       },
     };
 
-    await shopAdminController.createShop(req, res, errorHandler);
+    await adminController.createShop(req, res, errorHandler);
     shopId = res.data._id;
     expect(res.statusCode).to.equal(200);
     expect(res.data).to.be.an("object");
@@ -47,11 +47,7 @@ describe("shopController", () => {
         return this;
       },
     };
-    const newShop = await shopAdminController.createShop(
-      req,
-      res,
-      errorHandler
-    );
+    const newShop = await adminController.createShop(req, res, errorHandler);
     expect(res.statusCode).to.equal(400);
     expect(res.data).to.be.an("object");
   });
@@ -71,11 +67,7 @@ describe("shopController", () => {
       },
     };
 
-    const shops = await shopAdminController.getManyShops(
-      req,
-      res,
-      errorHandler
-    );
+    const shops = await adminController.getManyShops(req, res, errorHandler);
     expect(res.statusCode).to.equal(200);
     expect(res.data).to.be.an("array");
   });
@@ -97,12 +89,12 @@ describe("shopController", () => {
       },
     };
 
-    await shopAdminController.getShopById(req, res, errorHandler);
+    await adminController.getShopById(req, res, errorHandler);
     expect(res.statusCode).to.equal(200);
     expect(res.data).to.be.an("object");
   });
 
-  it("should reserve room", async () => {
+  it("should book room", async () => {
     let req = {
       body: {
         roomId: global.room1Id,

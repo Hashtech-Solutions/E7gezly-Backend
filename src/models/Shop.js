@@ -29,7 +29,6 @@ const roomSchema = mongoose.Schema({
     required: true,
     // auto-generate a new ObjectId
     default: () => new mongoose.Types.ObjectId(),
-    unique: true,
   },
   games: [gamesSchema],
   roomType: {
@@ -74,11 +73,24 @@ const shopSchema = mongoose.Schema({
   baseHourlyRate: {
     type: Number,
   },
-  moderator: {
+  shopAdminId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
+  shopModerators: [
+    {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "User",
+      },
+      userName: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
   availableGames: [gamesSchema],
   rooms: [
     {
