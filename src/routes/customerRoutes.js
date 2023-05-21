@@ -6,10 +6,14 @@ const router = express.Router();
 
 router.get("/shop", customerController.getManyShops);
 
+router.get("/shop/:shop_id", customerController.getOneShop);
+
 router.post(
   "/shop/:shop_id/book_room",
   validateDate,
   customerController.bookRoom
 );
+
+router.get("/reservation", customerController.getCustomerReservations);
 
 export default router;
