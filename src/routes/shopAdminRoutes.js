@@ -2,11 +2,14 @@ import express from "express";
 import * as shopAdminController from "../controllers/shopAdminController.js";
 import * as shopValidation from "../schemaValidations/shopValidation.js";
 import validateBody from "../middleware/validateBody.js";
+import { uploadImage, uploadMiddleware } from "../middleware/upload.js";
 
 const router = express.Router();
 
 router.put(
   "/update_info",
+  uploadImage,
+  uploadMiddleware,
   validateBody(shopValidation.updateShopInfo),
   shopAdminController.updateShopInfo
 );

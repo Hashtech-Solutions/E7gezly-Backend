@@ -54,7 +54,11 @@ const roomSchema = mongoose.Schema({
     type: Number,
     required: false,
   },
-  availableServices: [enums.shopEnums.services],
+  availableServices: [
+    {
+      type: String,
+    },
+  ],
 });
 
 const shopSchema = mongoose.Schema({
@@ -62,6 +66,11 @@ const shopSchema = mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+  },
+
+  image: {
+    type: String,
+    required: false,
   },
 
   isOpen: {

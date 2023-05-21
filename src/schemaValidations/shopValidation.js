@@ -29,10 +29,10 @@ export const updateShopInfo = Joi.object({
       image: Joi.string(),
     })
   ),
-  //   validate activities in shopEnums.activities
   availableServices: Joi.array().items(
     Joi.string().valid(...enums.shopEnums.services)
   ),
+  image: Joi.string(),
 });
 
 export const roomSchema = Joi.object({
