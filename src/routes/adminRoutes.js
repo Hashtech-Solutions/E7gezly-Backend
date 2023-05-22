@@ -2,6 +2,7 @@ import express from "express";
 import * as adminController from "../controllers/adminController.js";
 import * as shopValidation from "../schemaValidations/shopValidation.js";
 import validateBody from "../middleware/validateBody.js";
+import { uploadImage, uploadMiddleware } from "../middleware/upload.js";
 
 const router = express.Router();
 /**
@@ -15,14 +16,14 @@ const router = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Admin'
+ *             $ref: '#/components/schemas/Shop'
  *     responses:
  *       200:
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Admin'
+ *               $ref: '#/components/schemas/Shop'
  * /admin/shop/{shop_id}:
  *   get:
  *     summary: Get a shop by ID
@@ -39,7 +40,6 @@ const router = express.Router();
  *         description: OK
  *         content:
  *           application/json:
- *             schema:
  * admin/shop/{shopId}:
  *   put:
  *     summary: Update a shop by ID
@@ -63,10 +63,12 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Admin'
+ *               $ref: '#/components/schemas/Shop'
  */
 router.post(
   "/",
+  uploadImage,
+  uploadMiddleware,
   validateBody(shopValidation.shopSchema),
   adminController.createShop
 );

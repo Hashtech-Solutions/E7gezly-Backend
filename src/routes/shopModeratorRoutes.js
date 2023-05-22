@@ -55,7 +55,7 @@ const router = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateRoom'
+ *             $ref: '#/components/schemas/Room'
  *     responses:
  *       200:
  *         description: OK

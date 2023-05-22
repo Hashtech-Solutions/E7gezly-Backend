@@ -90,8 +90,19 @@ export default router;
  *             enum:
  *               - service1
  *               - service2
- *         image:
- *           type: string
+ *         availableActivities:
+ *           type: array
+ *           items:
+ *             type: string
+ *         extras:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               price:
+ *                 type: number
  *     Room:
  *       type: object
  *       properties:
@@ -106,37 +117,7 @@ export default router;
  *           type: number
  *         capacity:
  *           type: number
- *         games:
- *           type: array
- *           items:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               image:
- *                 type: string
- *         availableServices:
- *           type: array
- *           items:
- *             type: string
- *             enum:
- *               - service1
- *               - service2
- *     UpdateRoom:
- *       type: object
- *       properties:
- *         name:
- *           type: string
- *         roomType:
- *           type: string
- *           enum:
- *             - roomType1
- *             - roomType2
- *         hourlyRate:
- *           type: number
- *         capacity:
- *           type: number
- *         games:
+ *         availableGames:
  *           type: array
  *           items:
  *             type: object
