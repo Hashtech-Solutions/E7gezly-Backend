@@ -44,8 +44,6 @@ const router = express.Router();
  */
 router.put(
   "/update_info",
-  uploadImage,
-  uploadMiddleware,
   validateBody(shopValidation.updateShopInfo),
   shopAdminController.updateShopInfo
 );
