@@ -163,7 +163,6 @@ shopSchema.pre("save", async function (next) {
   }
   next();
 });
-
 const Shop = mongoose.model("Shop", shopSchema);
 
 export default Shop;

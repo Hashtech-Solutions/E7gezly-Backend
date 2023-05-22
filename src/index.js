@@ -6,6 +6,8 @@ import errorHandler from "./middleware/errorHandler.js";
 import router from "./routes/index.js";
 import session from "express-session";
 import passport from "passport";
+import swaggerUi from "swagger-ui-express";
+import swaggerJsdoc from "swagger-jsdoc";
 
 dotenv.config();
 
@@ -39,13 +41,33 @@ connectDB();
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get("/", (req, res) => {
-  console.log(req.isAuthenticated());
-  res.send("Hello World");
-});
+const options = {
+  definition: {
+    version: "2.0",
+    openapi: "3.0.1",
+    info: {
+      title: "Express API for E7gezly with Swagger",
+    },
+    servers: [
+      {
+        url: `${process.env.DOMAIN}`,
+      },
+    ],
+  },
+  apis: ["./src/routes/*.js"],
+};
+
+const specs = swaggerJsdoc(options);
+
+if (process.env.NODE_ENV !== "production") {
+  app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(specs, { explorer: true })
+  );
+}
 
 app.use("/api", router);
-
 app.use(errorHandler);
 
 app.listen(3000, () => console.log("Server running on port 3000"));
