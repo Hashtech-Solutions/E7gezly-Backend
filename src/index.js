@@ -46,7 +46,8 @@ const options = {
     version: "2.0",
     openapi: "3.0.1",
     info: {
-      title: "Express API for E7gezly with Swagger",
+      title: "Express API for E7gezly Backend",
+      description: "Kosom eldocumentation 3la kosom ra2fat 3shan ma3mlosh",
     },
     servers: [
       {
@@ -60,11 +61,15 @@ const options = {
 const specs = swaggerJsdoc(options);
 
 if (process.env.NODE_ENV !== "production") {
-  app.use(
-    "/api-docs",
-    swaggerUi.serve,
-    swaggerUi.setup(specs, { explorer: true })
-  );
+  try {
+    app.use(
+      "/api-docs",
+      swaggerUi.serve,
+      swaggerUi.setup(specs, { explorer: true })
+    );
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 app.use("/api", router);
