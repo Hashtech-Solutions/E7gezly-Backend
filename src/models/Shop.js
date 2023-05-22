@@ -33,7 +33,7 @@ const roomSchema = mongoose.Schema({
       return `${shopId}-${newId}`;
     },
   },
-  games: [gamesSchema],
+  availableGames: [gamesSchema],
   roomType: {
     type: String,
     enum: enums.shopEnums.roomTypes,
@@ -104,6 +104,11 @@ const shopSchema = mongoose.Schema({
     },
   ],
   availableGames: [gamesSchema],
+  availableServices: [
+    {
+      type: String,
+    },
+  ],
   rooms: [
     {
       type: roomSchema,
@@ -150,7 +155,11 @@ const shopSchema = mongoose.Schema({
       },
     },
   ],
-  availableActivities: [enums.shopEnums.activities],
+  availableActivities: [
+    {
+      type: String,
+    },
+  ],
 });
 
 // verify that roomNames are unique for the same shop

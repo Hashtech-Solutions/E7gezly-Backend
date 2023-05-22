@@ -8,6 +8,7 @@ export const shopSchema = Joi.object({
     long: Joi.number().required(),
     lat: Joi.number().required(),
   }),
+  image: Joi.string(),
   password: Joi.string().min(8).required(),
 });
 
@@ -29,10 +30,18 @@ export const updateShopInfo = Joi.object({
       image: Joi.string(),
     })
   ),
+  availableActivities: Joi.array().items(
+    Joi.string().valid(...enums.shopEnums.activities)
+  ),
   availableServices: Joi.array().items(
     Joi.string().valid(...enums.shopEnums.services)
   ),
-  image: Joi.string(),
+  extras: Joi.array().items(
+    Joi.object({
+      name: Joi.string().required(),
+      price: Joi.number().required(),
+    })
+  ),
 });
 
 export const roomSchema = Joi.object({
@@ -42,7 +51,7 @@ export const roomSchema = Joi.object({
     .required(),
   hourlyRate: Joi.number(),
   capacity: Joi.number(),
-  games: Joi.array().items(
+  availableGames: Joi.array().items(
     Joi.object({
       name: Joi.string().required(),
       image: Joi.string(),
@@ -58,7 +67,7 @@ export const updateRoom = Joi.object({
   roomType: Joi.string().valid(...enums.shopEnums.roomTypes),
   hourlyRate: Joi.number(),
   capacity: Joi.number(),
-  games: Joi.array().items(
+  availableGames: Joi.array().items(
     Joi.object({
       name: Joi.string().required(),
       image: Joi.string(),
