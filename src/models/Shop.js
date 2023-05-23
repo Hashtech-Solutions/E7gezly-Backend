@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { reservationSchema } from "./Reservation.js";
 import * as enums from "./enums.js";
 
 const locationSchema = mongoose.Schema({
@@ -59,6 +60,7 @@ const roomSchema = mongoose.Schema({
       type: String,
     },
   ],
+  reservations: [reservationSchema],
 });
 
 const shopSchema = mongoose.Schema({

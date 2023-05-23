@@ -1,7 +1,9 @@
 import express from "express";
-import * as shopAdminController from "../controllers/shopAdminController.js";
+import * as shopController from "../controllers/shopController.js";
 import * as shopValidation from "../schemaValidations/shopValidation.js";
+import * as customerValidation from "../schemaValidations/customerValidation.js";
 import validateBody from "../middleware/validateBody.js";
+import validateDate from "../middleware/validateDate.js";
 
 const router = express.Router();
 
@@ -17,7 +19,7 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Shop'
+ *               $ref: '#/components/schemas/ShopResponse'
  * /shop_moderator/toggle_status:
  *   put:
  *     summary: Toggle the status of a shop moderator
@@ -84,27 +86,49 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/CheckIn'
+ * /shop_moderator/book_room:
+ *   post:
+ *     summary: Book a room
+ *     tags: [ShopModerator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/BookRoom'
  */
-router.get("/shop_info", shopAdminController.getShopInfo);
+router.get("/shop_info", shopController.getShopInfo);
 
-router.put("/toggle_status", shopAdminController.toggleStatus);
+router.put("/toggle_status", shopController.toggleStatus);
 
 router.put(
   "/room/:room_id",
   validateBody(shopValidation.updateRoom),
-  shopAdminController.updateRoom
+  shopController.updateRoom
 );
 
 router.put(
   "/check_in",
   validateBody(shopValidation.checkIn),
-  shopAdminController.checkInRoom
+  shopController.checkInRoom
 );
 
 router.put(
   "/check_out",
   validateBody(shopValidation.checkOut),
-  shopAdminController.checkOutRoom
+  shopController.checkOutRoom
+);
+
+router.post(
+  "/book_room",
+  validateDate,
+  validateBody(customerValidation.bookRoom),
+  shopController.bookRoom
+);
+
+router.delete(
+  "reservation/:reservation_id",
+  shopController.deleteReservationById
 );
 
 export default router;
