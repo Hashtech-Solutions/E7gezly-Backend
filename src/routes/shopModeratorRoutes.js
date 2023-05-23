@@ -96,6 +96,16 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/BookRoom'
+ * /shop_moderator/reservation/{reservation_id}:
+ *   delete:
+ *     summary: Delete a reservation by ID
+ *     tags: [ShopModerator]
+ *     parameters:
+ *       - in: path
+ *         name: reservationId
+ *         schema:
+ *           type: string
+ *         required: true
  */
 router.get("/shop_info", shopController.getShopInfo);
 
