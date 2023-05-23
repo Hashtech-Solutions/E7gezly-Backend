@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { Strategy as LocalStrategy } from "passport-local";
 import * as userService from "../services/userService.js";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as FacebookStrategy } from "passport-facebook";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -61,17 +62,52 @@ passport.use(
   )
 );
 
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+      callbackURL: `http://localhost:3000/api/auth/facebook/callback/`,
+      // passReqToCallback: true,
+      profileFields:['email', 'name','displayName','photos'],
+      // state: true,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        // const user = await userService.getUserByUserName(profile.id);
+        // if (user) {
+        //   return done(null, user);
+        // }
+        const newUser = {
+          id: profile.id,
+          name: profile.displayName,
+          photo: profile.photos[0].value,
+          provider: profile.provider,
+        }
+        // const createUser = await userService.createUser(newUser);
+        console.log('usrrr', newUser);
+        return done(null, newUser);
+      } catch (error) {
+        return done(error);
+      }
+    }
+  )
+);
+
+
 passport.serializeUser((user, done) => {
-  done(null, user._id);
+  done(null, user);
 });
 
 passport.deserializeUser(async (_id, done) => {
-  try {
-    const user = await userService.getUserById(_id);
-    done(null, user);
-  } catch (error) {
-    done(error);
-  }
+  // try {
+  //   const user = await userService.getUserById(_id);
+  //   done(null, user);
+  // } catch (error) {
+  //   done(error);
+  // }
+  // console.log("deserializeUser", _id);
+  return done(null, _id);
 });
 
 passport.authorize = (role) => {

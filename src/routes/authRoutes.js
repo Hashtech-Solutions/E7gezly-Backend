@@ -45,5 +45,7 @@ router.post("/signup", authController.signup);
 router.get("/logout", authController.logout);
 router.get("/google", authController.googleLogin);
 router.get("/google/callback", authController.googleCallback);
+router.get("/facebook", authController.facebookLogin);
+router.get("/facebook/callback", authController.facebookCallback);
 
 export default router;

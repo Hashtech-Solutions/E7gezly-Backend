@@ -52,6 +52,29 @@ export const googleCallback = (req, res, next) => {
   })(req, res, next);
 };
 
+export const facebookLogin = (req, res, next) => {
+  console.log("facebook login");
+  passport.authenticate(
+    'facebook',
+    (err, user, info) => {
+      if (err) return next(err);
+      if (!user) return next({ status: 400, message: info.message });
+      req.logIn(user, (err) => {
+        if (err) return next({ status: 400, message: err });
+        return res.status(200).json(user);
+      });
+    }
+  )(req, res, next);
+};
+
+export const facebookCallback = (req, res, next) => {
+  console.log("facebook callback");
+  passport.authenticate('facebook', {
+    successRedirect: "/",
+    failureRedirect: "/login",
+  }) (req, res, next);
+};
+
 export const logout = (req, res, next) => {
   req.logout((err) => {
     if (err) return next({ status: 400, message: err });
