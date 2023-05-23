@@ -32,6 +32,23 @@ router.use("/customer", passport.authorize("customer"), customer);
 
 export default router;
 
+/*
+ * @swagger
+ * components:
+ *   schemas:
+ *     RoomResponse:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         roomType:
+ *           type: string
+ *           enum:
+ *             - 'type1'
+ *             - 'type2'
+ *             - 'type3'
+ */
+
 /**
  * @swagger
  * components:
@@ -52,6 +69,50 @@ export default router;
  *               type: number
  *         password:
  *           type: string
+ *     ReservationResponse:
+ *       type: object
+ *       properties:
+ *         startTime:
+ *           type: date
+ *         endTime:
+ *           type: date
+ *         roomId:
+ *           type: string
+ *         userId:
+ *           type: string
+ *         shopId:
+ *           type: string
+ *     RoomResponse:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         roomType:
+ *           type: string
+ *         reservations:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/ReservationResponse'
+ *         name:
+ *           type: string
+ *           description: The name of the room.
+ *         status:
+ *           type: string
+ *           enum:
+ *             - 'occupied'
+ *             - 'available'
+ *           description: The current status of the room.
+ *         hourlyRate:
+ *           type: number
+ *           description: The hourly rate for the room (optional).
+ *         capacity:
+ *           type: number
+ *           description: The capacity of the room (optional).
+ *         availableServices:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: List of available services in the room.
  *     ShopModerator:
  *       type: object
  *       properties:
@@ -143,6 +204,112 @@ export default router;
  *       properties:
  *         roomId:
  *           type: string
+ *     ShopResponse:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: The name of the shop.
+ *           unique: true
+ *           required: true
+ *         image:
+ *           type: string
+ *           description: The image of the shop.
+ *           required: false
+ *         isOpen:
+ *           type: boolean
+ *           description: Indicates if the shop is open or closed.
+ *           required: true
+ *         location:
+ *           $ref: '#/components/schemas/Location'
+ *           description: The coordinates of the shop's location.
+ *           required: false
+ *         baseHourlyRate:
+ *           type: number
+ *           description: The base hourly rate of the shop.
+ *         shopAdminId:
+ *           type: string
+ *           description: The ID of the shop's administrator.
+ *           required: true
+ *         shopModerators:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               _id:
+ *                 type: string
+ *                 description: The ID of the shop moderator.
+ *                 required: true
+ *               userName:
+ *                 type: string
+ *                 description: The username of the shop moderator.
+ *                 required: true
+ *           description: List of shop moderators.
+ *         availableGames:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Game'
+ *           description: List of available games in the shop.
+ *         availableServices:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: List of available services in the shop.
+ *         rooms:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/RoomResponse'
+ *           description: List of rooms in the shop.
+ *         sessions:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               roomId:
+ *                 type: string
+ *                 description: The ID of the room for the session.
+ *                 required: true
+ *               roomName:
+ *                 type: string
+ *                 description: The name of the room for the session.
+ *                 required: true
+ *               startTime:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The start time of the session.
+ *                 required: true
+ *               endTime:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The end time of the session.
+ *                 required: false
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user for the session.
+ *                 required: false
+ *           description: List of sessions in the shop.
+ *         numVacancies:
+ *           type: number
+ *           description: The number of vacancies in the shop.
+ *         extras:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: The name of the extra.
+ *                 required: true
+ *               price:
+ *                 type: number
+ *                 description: The price of the extra.
+ *                 required: true
+ *           description: List of extras in the shop.
+ *         availableActivities:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: List of available activities in the shop.
  */
 
 /**

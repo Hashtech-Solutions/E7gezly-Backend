@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import * as shopAdminController from "../../controllers/shopAdminController.js";
+import * as shopController from "../../controllers/shopController.js";
 import errorHandler from "../../middleware/errorHandler.js";
 
 describe("shop admin tests", () => {
@@ -23,12 +23,12 @@ describe("shop admin tests", () => {
         return this;
       },
     };
-    const room = await shopAdminController.addRoom(req, res, errorHandler);
+    const room = await shopController.addRoom(req, res, errorHandler);
     roomId = res.data.rooms.find((room) => room.name === "test")._id;
     expect(res.statusCode).to.equal(200);
     expect(res.data).to.be.an("object");
     // shouldn't add room with non-unqiue name
-    const room2 = await shopAdminController.addRoom(req, res, errorHandler);
+    const room2 = await shopController.addRoom(req, res, errorHandler);
     expect(res.statusCode).to.equal(400);
     expect(res.data).to.be.an("object");
   });
@@ -54,7 +54,7 @@ describe("shop admin tests", () => {
         return this;
       },
     };
-    await shopAdminController.updateRoom(req, res, errorHandler);
+    await shopController.updateRoom(req, res, errorHandler);
     const updatedRoom = res.data.rooms.find(
       (room) => `${room._id}` === `${roomId}`
     );
@@ -79,13 +79,13 @@ describe("shop admin tests", () => {
         return this;
       },
     };
-    await shopAdminController.checkInRoom(req, res, errorHandler);
+    await shopController.checkInRoom(req, res, errorHandler);
     numVacancies = res.data.numVacancies;
     expect(res.statusCode).to.equal(200);
     expect(
       res.data.sessions.find((session) => `${session.roomId}` === `${roomId}`)
     ).to.be.an("object");
-    await shopAdminController.checkInRoom(req, res, errorHandler);
+    await shopController.checkInRoom(req, res, errorHandler);
     expect(res.statusCode).to.equal(400);
   });
 
@@ -106,7 +106,7 @@ describe("shop admin tests", () => {
         return this;
       },
     };
-    await shopAdminController.checkOutRoom(req, res, errorHandler);
+    await shopController.checkOutRoom(req, res, errorHandler);
     expect(res.statusCode).to.equal(200);
     expect(res.data.numVacancies).to.equal(numVacancies + 1);
     expect(
@@ -132,7 +132,7 @@ describe("shop admin tests", () => {
         return this;
       },
     };
-    await shopAdminController.createShopModerator(req, res, errorHandler);
+    await shopController.createShopModerator(req, res, errorHandler);
     expect(res.statusCode).to.equal(200);
     expect(res.data).to.be.an("object");
   });
