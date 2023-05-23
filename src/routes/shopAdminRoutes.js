@@ -1,5 +1,5 @@
 import express from "express";
-import * as shopAdminController from "../controllers/shopAdminController.js";
+import * as shopController from "../controllers/shopController.js";
 import * as shopValidation from "../schemaValidations/shopValidation.js";
 import validateBody from "../middleware/validateBody.js";
 import { uploadImage, uploadMiddleware } from "../middleware/upload.js";
@@ -45,24 +45,24 @@ const router = express.Router();
 router.put(
   "/update_info",
   validateBody(shopValidation.updateShopInfo),
-  shopAdminController.updateShopInfo
+  shopController.updateShopInfo
 );
 
 router.post(
   "/moderator",
   validateBody(shopValidation.shopModeratorSchema),
-  shopAdminController.createShopModerator
+  shopController.createShopModerator
 );
 
 router.delete(
   "/moderator/:shop_moderator_id",
-  shopAdminController.removeShopModerator
+  shopController.removeShopModerator
 );
 
 router.post(
   "/room",
   validateBody(shopValidation.roomSchema),
-  shopAdminController.addRoom
+  shopController.addRoom
 );
 
 export default router;

@@ -1,6 +1,8 @@
 import express from "express";
 import * as customerController from "../controllers/customerController.js";
 import validateDate from "../middleware/validateDate.js";
+import * as customerValidation from "../schemaValidations/customerValidation.js";
+import validateBody from "../middleware/validateBody.js";
 
 const router = express.Router();
 
@@ -17,6 +19,13 @@ const router = express.Router();
  *           type: string
  *         required: true
  *         description: ID of the shop to retrieve
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ShopResponse'
  * /customer/shop:
  *   get:
  *     summary: Retrieve multiple shops
@@ -67,6 +76,7 @@ router.get("/shop/:shop_id", customerController.getShopById);
 router.post(
   "/shop/:shop_id/book_room",
   validateDate,
+  validateBody(customerValidation.bookRoom),
   customerController.bookRoom
 );
 

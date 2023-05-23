@@ -40,6 +40,8 @@ const router = express.Router();
  *         description: OK
  *         content:
  *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ShopResponse'
  * admin/shop/{shopId}:
  *   put:
  *     summary: Update a shop by ID

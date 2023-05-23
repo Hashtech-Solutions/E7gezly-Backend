@@ -151,7 +151,9 @@ export const checkInRoom = async (req, res, next) => {
               roomId,
               roomName: shop.rooms.find((room) => `${room._id}` === `${roomId}`)
                 .name,
-              startTime: new Date(),
+              startTime: new Date().toLocaleString("en-US", {
+                timeZone: "Africa/Cairo",
+              }),
             },
           ],
         },
@@ -213,14 +215,25 @@ export const checkOutRoom = async (req, res, next) => {
 export const bookRoom = async (req, res, next) => {
   try {
     const shopId = req.shopId;
-    const { roomId, startTime, endTime, userId } = req.body;
+    const { roomId, startTime, endTime } = req.body;
     const reservation = await reservationService.createReservation({
       shopId,
       roomId,
       startTime,
       endTime,
-      userId,
     });
+    res.status(200).json(reservation);
+  } catch (error) {
+    return next({ status: 400, message: error }, req, res, next);
+  }
+};
+
+export const deleteReservationById = async (req, res, next) => {
+  try {
+    const reservationId = req.params.reservation_id;
+    const reservation = await reservationService.deleteReservationById(
+      reservationId
+    );
     res.status(200).json(reservation);
   } catch (error) {
     return next({ status: 400, message: error }, req, res, next);
