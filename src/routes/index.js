@@ -32,23 +32,6 @@ router.use("/customer", passport.authorize("customer"), customer);
 
 export default router;
 
-/*
- * @swagger
- * components:
- *   schemas:
- *     RoomResponse:
- *       type: object
- *       properties:
- *         _id:
- *           type: string
- *         roomType:
- *           type: string
- *           enum:
- *             - 'type1'
- *             - 'type2'
- *             - 'type3'
- */
-
 /**
  * @swagger
  * components:

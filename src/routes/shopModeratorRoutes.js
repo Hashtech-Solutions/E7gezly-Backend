@@ -106,8 +106,21 @@ const router = express.Router();
  *         schema:
  *           type: string
  *         required: true
+ * /shop_moderator/room:
+ *   get:
+ *     summary: Get all rooms for a shop
+ *     tags: [ShopModerator]
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RoomResponse'
  */
 router.get("/shop_info", shopController.getShopInfo);
+
+router.get("/room", shopController.getShopRooms);
 
 router.put("/toggle_status", shopController.toggleStatus);
 
