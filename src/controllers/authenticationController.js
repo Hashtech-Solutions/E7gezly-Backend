@@ -56,6 +56,7 @@ export const facebookLogin = (req, res, next) => {
   console.log("facebook login");
   passport.authenticate(
     'facebook',
+    { scope : ['email'] },
     (err, user, info) => {
       if (err) return next(err);
       if (!user) return next({ status: 400, message: info.message });

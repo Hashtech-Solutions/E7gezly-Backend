@@ -25,6 +25,7 @@ passport.use(
         if (!isPasswordValid) {
           return done(null, false, { message: "Incorrect password." });
         }
+        console.log("user", user);
         return done(null, user);
       } catch (error) {
         return done(error);
@@ -38,11 +39,12 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${process.env.DOMAIN}/api/auth/google/callback`,
+      callbackURL: `${process.env.DOMAIN}api/auth/google/callback`,
       passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
+        // console.log("Gprofile", profile);
         const userName = profile.emails[0].value.split("@")[0];
         const user = await userService.getUserByUserName(userName);
         if (user) {
@@ -51,6 +53,7 @@ passport.use(
         const newUser = {
           userName,
           password: await bcrypt.hash(profile.id, 10),
+          email: profile.emails[0].value,
           role: "customer",
         };
         const createdUser = await userService.createUser(newUser);
@@ -68,25 +71,24 @@ passport.use(
       clientID: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
       callbackURL: `http://localhost:3000/api/auth/facebook/callback/`,
-      // passReqToCallback: true,
-      profileFields:['email', 'name','displayName','photos'],
-      // state: true,
+      profileFields:['email', 'name','displayName','photos']
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // const user = await userService.getUserByUserName(profile.id);
-        // if (user) {
-        //   return done(null, user);
-        // }
-        const newUser = {
-          id: profile.id,
-          name: profile.displayName,
-          photo: profile.photos[0].value,
-          provider: profile.provider,
+        // console.log('fprofile',profile);
+        const userName = profile.emails[0].value.split("@")[0];
+        const user = await userService.getUserByUserName(userName);
+        if (user) {
+          return done(null, user);
         }
-        // const createUser = await userService.createUser(newUser);
-        console.log('usrrr', newUser);
-        return done(null, newUser);
+        const newUser = {
+          userName,
+          password: await bcrypt.hash(profile.id, 10),
+          email: profile.emails[0].value,
+          role: "customer",
+        }
+        const createUser = await userService.createUser(newUser);
+        return done(null, createUser);
       } catch (error) {
         return done(error);
       }
@@ -96,18 +98,18 @@ passport.use(
 
 
 passport.serializeUser((user, done) => {
-  done(null, user);
+  console.log("serialized");
+  done(null, user._id);
 });
 
 passport.deserializeUser(async (_id, done) => {
-  // try {
-  //   const user = await userService.getUserById(_id);
-  //   done(null, user);
-  // } catch (error) {
-  //   done(error);
-  // }
-  // console.log("deserializeUser", _id);
-  return done(null, _id);
+  try {
+    console.log("deserialized");
+    const user = await userService.getUserById(_id);
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
 });
 
 passport.authorize = (role) => {
