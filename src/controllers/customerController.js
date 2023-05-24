@@ -40,7 +40,8 @@ export const bookRoom = async (req, res, next) => {
 
 export const getShopById = async (req, res, next) => {
   try {
-    const shop = await shopService.getShopById(req.params.id);
+    const shopId = req.params.shop_id;
+    const shop = await shopService.getShopById(shopId);
     res.status(200).json(shop);
   } catch (error) {
     return next({ status: 400, message: error });
