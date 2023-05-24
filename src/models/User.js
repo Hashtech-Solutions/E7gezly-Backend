@@ -8,6 +8,11 @@ const userSchema = mongoose.Schema({
   },
   email: {
     type: String,
+    required: false,
+  },
+  verified: {
+    type: Boolean,
+    default: false,
   },
   password: {
     type: String,

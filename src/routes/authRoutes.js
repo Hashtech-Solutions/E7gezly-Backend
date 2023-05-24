@@ -42,6 +42,10 @@ const router = express.Router();
  */
 router.post("/login", validateBody(authValidation.login), authController.login);
 router.post("/signup", authController.signup);
+router.post("/forgot_password", authController.forgotPassword);
+router.post("/reset_password/:token", authController.resetPassword);
+router.post("/send_verification_email", authController.sendVerifyEmail);
+router.get("/verify_email/:token", authController.verifyEmail);
 router.get("/logout", authController.logout);
 router.get("/google", authController.googleLogin);
 router.get("/google/callback", authController.googleCallback);

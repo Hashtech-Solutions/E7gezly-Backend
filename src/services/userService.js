@@ -37,6 +37,15 @@ export const getUserByUserName = async (userName) => {
   }
 };
 
+export const getUserByEmail = async (email) => {
+  try {
+    const user = await User.findOne({ email });
+    return user;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const updateUser = async (id, user) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(id, user, { new: true });

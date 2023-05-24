@@ -8,20 +8,33 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const PEPPER = process.env.PEPPER
+const ROUNDS = Number(process.env.ROUNDS)
+
 passport.use(
   "local",
   new LocalStrategy(
     {
-      usernameField: "userName",
+      usernameField: "identifier",
       passwordField: "password",
     },
-    async (userName, password, done) => {
+    async (identifier, password, done) => {
       try {
-        const user = await userService.getUserByUserName(userName);
+        const emailRegex = /^\S+@\S+\.\S+$/;
+        const match = identifier.match(emailRegex);
+        let user;
+        if (match) {
+          user = await userService.getUserByEmail(identifier);
+          if (user.verified === false) {
+            return done(null, false, { message: "Email not verified" });
+          }
+        } else {
+          user = await userService.getUserByUserName(identifier);
+        }
         if (!user) {
           return done(null, false, { message: "Incorrect username." });
         }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password + PEPPER, user.password);
         if (!isPasswordValid) {
           return done(null, false, { message: "Incorrect password." });
         }
@@ -39,7 +52,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${process.env.DOMAIN}api/auth/google/callback`,
+      callbackURL: `${process.env.DOMAIN}/api/auth/google/callback`,
       passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
@@ -52,7 +65,7 @@ passport.use(
         }
         const newUser = {
           userName,
-          password: await bcrypt.hash(profile.id, 10),
+          password: await bcrypt.hash(profile.id + PEPPER, ROUNDS),
           email: profile.emails[0].value,
           role: "customer",
         };
@@ -70,7 +83,7 @@ passport.use(
     {
       clientID: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      callbackURL: `http://localhost:3000/api/auth/facebook/callback/`,
+      callbackURL: `${process.env.DOMAIN}/api/auth/facebook/callback`,
       profileFields:['email', 'name','displayName','photos']
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -83,7 +96,7 @@ passport.use(
         }
         const newUser = {
           userName,
-          password: await bcrypt.hash(profile.id, 10),
+          password: await bcrypt.hash(profile.id + PEPPER, ROUNDS),
           email: profile.emails[0].value,
           role: "customer",
         }

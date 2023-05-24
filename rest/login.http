@@ -35,7 +35,7 @@ POST http://localhost:3000/api/auth/signup
 Content-Type: application/json
 
 {
-    "userName": "Darwin",
+    "identifier": "Darwin1@gmail.com",
     "password": "password",
     "role": "customer"
 }
@@ -45,7 +45,42 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-    "userName": "Darwin",
+    "identifier": "Darwin@gmail.com",
     "password": "password"
 }
 
+###+ process.env.PEPPER
+
+get http://localhost:3000/api/auth/facebook
+
+###
+
+POST http://localhost:3000/api/auth/forgot_password
+Content-Type: application/json
+
+{
+    "email": "Darwin@gmail.com"
+}
+
+###
+
+POST http://localhost:3000/api/auth/reset_password/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NmQ3OGNiZmFjMWNhNjc2ZWZhZmQzZSIsImVtYWlsIjoiRGFyd2luQGdtYWlsLmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTY4NDg5NzQ4MiwiZXhwIjoxNjg0ODk4MzgyfQ.8sl0JRE9Er7n4TT6zAkJNHCSiBjptdtVP3FFlmAH9R0
+Content-Type: application/json
+
+{
+    "password": "password",
+    "passwordConfirmation": "password"
+}
+
+###
+
+POST http://localhost:3000/api/auth/send_verification_email
+Content-Type: application/json
+
+{
+    "email": "Darwin@gmail.com"
+}
+
+###
+
+GET http://localhost:3000/api/auth/verify_email/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NmQ3OGNiZmFjMWNhNjc2ZWZhZmQzZSIsImVtYWlsIjoiRGFyd2luQGdtYWlsLmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTY4NDkwMDE1NywiZXhwIjoxNjg0OTE4MTU3fQ._QF0Du9E9RgLNRt-sGy156qk-PrhmBiJeFlWyJTky8A
