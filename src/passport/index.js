@@ -30,6 +30,9 @@ passport.use(
           }
         } else {
           user = await userService.getUserByUserName(identifier);
+          if (user.role === "customer") {
+            return done(null, false, { message: "only available for shops!" });
+          }
         }
         if (!user) {
           return done(null, false, { message: "Incorrect username." });
@@ -38,7 +41,6 @@ passport.use(
         if (!isPasswordValid) {
           return done(null, false, { message: "Incorrect password." });
         }
-        console.log("user", user);
         return done(null, user);
       } catch (error) {
         return done(error);
@@ -111,13 +113,11 @@ passport.use(
 
 
 passport.serializeUser((user, done) => {
-  console.log("serialized");
   done(null, user._id);
 });
 
 passport.deserializeUser(async (_id, done) => {
   try {
-    console.log("deserialized");
     const user = await userService.getUserById(_id);
     done(null, user);
   } catch (error) {
