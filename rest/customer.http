@@ -11,3 +11,7 @@ Content-Type: application/json
     "startTime": "2019-12-12T52:00:00.000Z",
     "endTime": "2019-12-13T05:53:00.000Z"
 }
+
+##############################
+GET http://localhost:3000/api/customer/shop/646a1083672efef46a61a0a6
+

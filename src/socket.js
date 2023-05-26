@@ -1,38 +1,67 @@
-import app from "./index.js";
-import http from "http";
 import { Server } from "socket.io";
+import passport from "passport";
+import { sessionMiddleware } from "./index.js";
 
-const server = http.createServer(app);
-// should be changed in production
-const io = new Server(server, {
-  cors: {
-    origin: true,
-    credentials: true,
-  },
-});
-
+let ioInstance = null;
 const clientsByShopId = {};
 
-io.on("connection", (socket) => {
-  console.log("a user connected");
-  socket.on("subscribe", (shopId) => {
-    if (!clientsByShopId[shopId]) {
-      clientsByShopId[shopId] = new Set();
-    }
-    clientsByShopId[shopId].add(socket.id);
-    console.log(clientsByShopId);
-  });
+export const getIo = (server) => {
+  if (!ioInstance) {
+    const io = new Server(server, {
+      cors: {
+        origin: true,
+        credentials: true,
+      },
+    });
+    io.engine.use(sessionMiddleware);
+    io.engine.use(passport.initialize());
+    io.engine.use(passport.session());
 
-  socket.on("unsubscribe", (shopId) => {
-    if (clientsByShopId[shopId]) {
-      clientsByShopId[shopId].delete(socket.id);
-    }
-  });
+    io.use((socket, next) => {
+      if (socket.request.isAuthenticated()) {
+        return next();
+      } else {
+        io.emit("unauthorized");
+      }
+    });
 
-  socket.on("disconnect", () => {
-    // remove socket from clientsByShopId
-    for (const shopId in clientsByShopId) {
-      clientsByShopId[shopId].delete(socket.id);
-    }
+    ioInstance = io;
+  }
+  return ioInstance;
+};
+
+export const initConnection = (server) => {
+  const io = getIo(server);
+  io.on("connect", (socket) => {
+    console.log("user connected");
+    socket.on("subscribe", () => {
+      const shopId = socket.request.user.shopId;
+      if (!clientsByShopId[shopId]) {
+        clientsByShopId[shopId] = new Set();
+      }
+      clientsByShopId[shopId].add(socket.id);
+    });
+
+    socket.on("unsubscribe", (shopId) => {
+      if (clientsByShopId[shopId]) {
+        clientsByShopId[shopId].delete(socket.id);
+      }
+    });
+
+    socket.on("disconnect", () => {
+      console.log("user disconnected");
+      Object.values(clientsByShopId).forEach((clients) => {
+        clients.delete(socket.id);
+      });
+    });
   });
-});
+};
+
+export const emitEvent = (shopId, event, data) => {
+  const io = getIo();
+  if (clientsByShopId[shopId]) {
+    clientsByShopId[shopId].forEach((clientId) => {
+      io.to(clientId).emit(event, data);
+    });
+  }
+};
