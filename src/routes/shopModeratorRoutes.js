@@ -150,7 +150,7 @@ router.post(
 );
 
 router.delete(
-  "reservation/:reservation_id",
+  "/reservation/:reservation_id",
   shopController.deleteReservationById
 );
 
