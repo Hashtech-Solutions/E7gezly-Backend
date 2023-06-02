@@ -1,11 +1,11 @@
 import express from "express";
 import { createServer } from "http";
-import MongoStore from "connect-mongo";
+import sessionMiddleware from "./config/sessionMiddleware.js";
 import connectDB from "./config/database.js";
 import dotenv from "dotenv";
 import cors from "cors";
 import errorHandler from "./middleware/errorHandler.js";
-import router from "./routes/index.js";
+// import router from "./routes/index.js";
 import session from "express-session";
 import passport from "passport";
 import swaggerUi from "swagger-ui-express";
@@ -25,24 +25,6 @@ app.use(
     credentials: true,
   })
 );
-
-export const sessionMiddleware = session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  // should be changed in production
-  cookie: {
-    secure: process.env.NODE_ENV === "local" ? false : true,
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-    httpOnly: process.env.NODE_ENV === "local" ? false : true,
-    sameSite: process.env.NODE_ENV === "local" ? false : "none",
-    // sameSite: "none",
-  },
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URL,
-    collectionName: "auth-sessions",
-  }),
-});
 
 app.use(sessionMiddleware);
 

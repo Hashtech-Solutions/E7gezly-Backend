@@ -8,7 +8,8 @@ describe("reservation tests", () => {
     const req = {
       shopId: shopId,
       body: {
-        startTime: new Date("2021-02-03T00:00:00.000Z"),
+        // get iso string of date with local timezone
+        startTime: new Date("2021-02-03T00:00:00.000Z").toISOString(),
         endTime: new Date("2021-02-03T01:00:00.000Z"),
         roomId: room2Id,
       },
