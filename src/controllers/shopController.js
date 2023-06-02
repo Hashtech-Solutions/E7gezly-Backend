@@ -160,9 +160,7 @@ export const checkInRoom = async (req, res, next) => {
               roomId,
               roomName: shop.rooms.find((room) => `${room._id}` === `${roomId}`)
                 .name,
-              startTime: new Date().toLocaleString("en-US", {
-                timeZone: "Africa/Cairo",
-              }),
+              startTime: new Date().toISOString(),
             },
           ],
         },
