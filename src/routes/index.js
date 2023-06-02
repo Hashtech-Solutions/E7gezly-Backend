@@ -187,6 +187,29 @@ export default router;
  *       properties:
  *         roomId:
  *           type: string
+ *     CheckInResponse:
+ *       type: object
+ *       properties:
+ *         numVacancies:
+ *           type: number
+ *         session:
+ *           type: object
+ *           properties:
+ *             roomId:
+ *               type: string
+ *             startTime:
+ *               type: date
+ *             endTime:
+ *              type: date
+ *             userId:
+ *               type: string
+ *     CheckOutResponse:
+ *       type: object
+ *       properties:
+ *         numVacancies:
+ *           type: number
+ *         roomId:
+ *           type: string
  *     ShopResponse:
  *       type: object
  *       properties:

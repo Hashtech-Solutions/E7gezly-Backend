@@ -75,7 +75,13 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/CheckIn'
- *
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CheckInResponse'
  * /shop_moderator/check_out:
  *   put:
  *     summary: Check out a customer
@@ -85,7 +91,14 @@ const router = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CheckIn'
+ *             $ref: '#/components/schemas/CheckOut'
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CheckOutResponse'
  * /shop_moderator/book_room:
  *   post:
  *     summary: Book a room
