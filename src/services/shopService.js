@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import Shop from "../models/Shop.js";
 import mongoose from "mongoose";
+import { emitEvent } from "../socket.js";
 
 const setNumVacancies = {
   $size: {
@@ -180,10 +181,12 @@ export const checkInRoom = async (shopId, roomId, userId) => {
       },
     ]);
     const session = getSessionByRoomId(updatedShop, roomId);
-    return {
+    const returnValue = {
       session,
       numVacancies: updatedShop.numVacancies,
     };
+    emitEvent(shopId, "checkIn", returnValue);
+    return returnValue;
   } catch (error) {
     throw new Error(error);
   }
@@ -218,10 +221,12 @@ export const checkOutRoom = async (shopId, roomId) => {
         },
       ]
     );
-    return {
-      roomId,
+    const returnValue = {
       numVacancies: updatedShop.numVacancies,
+      roomId,
     };
+    emitEvent(shopId, "checkOut", returnValue);
+    return returnValue;
   } catch (error) {
     throw new Error(error);
   }
