@@ -63,7 +63,7 @@ if (process.env.NODE_ENV !== "production") {
   }
 }
 
-// app.use("/api", router);
+app.use("/api", router);
 app.use(errorHandler);
 
 initConnection(server);
