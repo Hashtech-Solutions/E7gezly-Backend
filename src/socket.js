@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import passport from "passport";
-import { sessionMiddleware } from "./index.js";
+import sessionMiddleware from "./config/sessionMiddleware.js";
 
 let ioInstance = null;
 const clientsByShopId = {};
@@ -58,10 +58,9 @@ export const initConnection = (server) => {
 };
 
 export const emitEvent = (shopId, event, data) => {
-  const io = getIo();
-  if (clientsByShopId[shopId]) {
+  if (clientsByShopId[shopId] && ioInstance) {
     clientsByShopId[shopId].forEach((clientId) => {
-      io.to(clientId).emit(event, data);
+      ioInstance.to(clientId).emit(event, data);
     });
   }
 };
