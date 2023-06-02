@@ -1,40 +1,6 @@
-import { set } from "mongoose";
 import * as shopService from "../services/shopService.js";
 import * as reservationService from "../services/reservationService.js";
 import bcrypt from "bcrypt";
-
-const setNumVacancies = {
-  $size: {
-    $filter: {
-      input: "$rooms",
-      as: "room",
-      cond: {
-        $eq: ["$$room.status", "available"],
-      },
-    },
-  },
-};
-
-const setRoomStatus = (roomId, status) => ({
-  $map: {
-    input: "$rooms",
-    as: "room",
-    in: {
-      $cond: {
-        if: { $eq: ["$$room._id", roomId] },
-        then: {
-          $mergeObjects: [
-            "$$room",
-            {
-              status: status,
-            },
-          ],
-        },
-        else: "$$room",
-      },
-    },
-  },
-});
 
 export const getShopInfo = async (req, res, next) => {
   try {
@@ -137,47 +103,10 @@ export const toggleStatus = async (req, res, next) => {
 
 export const checkInRoom = async (req, res, next) => {
   try {
-    const { roomId } = req.body;
-    const shop = await shopService.getShopById(req.shopId);
-    const session = shopService.getSessionByRoomId(shop, roomId);
-    if (session) {
-      return next(
-        {
-          status: 400,
-          message: "Room is already occupied",
-        },
-        req,
-        res,
-        next
-      );
-    }
-    const updatedShop = await shopService.updateShopById(req.shopId, [
-      {
-        $set: {
-          sessions: [
-            ...shop.sessions,
-            {
-              roomId,
-              roomName: shop.rooms.find((room) => `${room._id}` === `${roomId}`)
-                .name,
-              startTime: new Date().toISOString(),
-            },
-          ],
-        },
-      },
-      {
-        $set: {
-          rooms: setRoomStatus(roomId, "occupied"),
-        },
-      },
-      {
-        // set numVacancies to number of rooms minus number of sessions
-        $set: {
-          numVacancies: setNumVacancies,
-        },
-      },
-    ]);
-    res.status(200).json(updatedShop);
+    const { roomId, userId } = req.body;
+    const { shopId } = req;
+    const session = await shopService.checkInRoom(shopId, roomId, userId);
+    res.status(200).json(session);
   } catch (error) {
     return next({ status: 400, message: error }, req, res, next);
   }
@@ -186,34 +115,9 @@ export const checkInRoom = async (req, res, next) => {
 export const checkOutRoom = async (req, res, next) => {
   try {
     const { roomId } = req.body;
-    const updatedShop = await shopService.updateShopById(
-      req.shopId,
-      // increment numVacancies if <= capacity
-      [
-        {
-          $set: {
-            sessions: {
-              $filter: {
-                input: "$sessions",
-                as: "session",
-                cond: { $ne: ["$$session.roomId", roomId] },
-              },
-            },
-          },
-        },
-        {
-          $set: {
-            rooms: setRoomStatus(roomId, "available"),
-          },
-        },
-        {
-          $set: {
-            numVacancies: setNumVacancies,
-          },
-        },
-      ]
-    );
-    res.status(200).json(updatedShop);
+    const { shopId } = req;
+    const session = await shopService.checkOutRoom(shopId, roomId);
+    res.status(200).json(session);
   } catch (error) {
     return next({ status: 400, message: error }, req, res, next);
   }

@@ -82,9 +82,6 @@ describe("shop admin tests", () => {
     await shopController.checkInRoom(req, res, errorHandler);
     numVacancies = res.data.numVacancies;
     expect(res.statusCode).to.equal(200);
-    expect(
-      res.data.sessions.find((session) => `${session.roomId}` === `${roomId}`)
-    ).to.be.an("object");
     await shopController.checkInRoom(req, res, errorHandler);
     expect(res.statusCode).to.equal(400);
   });
@@ -109,9 +106,6 @@ describe("shop admin tests", () => {
     await shopController.checkOutRoom(req, res, errorHandler);
     expect(res.statusCode).to.equal(200);
     expect(res.data.numVacancies).to.equal(numVacancies + 1);
-    expect(
-      res.data.sessions.find((session) => `${session.roomId}` === `${roomId}`)
-    ).to.be.undefined;
   });
 
   it("should create shop moderator", async () => {
