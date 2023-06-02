@@ -1,6 +1,40 @@
 import User from "../models/User.js";
 import Shop from "../models/Shop.js";
 import mongoose from "mongoose";
+import { emitEvent } from "../socket.js";
+
+const setNumVacancies = {
+  $size: {
+    $filter: {
+      input: "$rooms",
+      as: "room",
+      cond: {
+        $eq: ["$$room.status", "available"],
+      },
+    },
+  },
+};
+
+const setRoomStatus = (roomId, status) => ({
+  $map: {
+    input: "$rooms",
+    as: "room",
+    in: {
+      $cond: {
+        if: { $eq: ["$$room._id", roomId] },
+        then: {
+          $mergeObjects: [
+            "$$room",
+            {
+              status: status,
+            },
+          ],
+        },
+        else: "$$room",
+      },
+    },
+  },
+});
 
 export const createShop = async (shop, shopAdmin) => {
   let shopAdminId;
@@ -107,6 +141,95 @@ export const getSessionByRoomId = (shop, roomId) => {
     (session) => `${session.roomId}` === `${roomId}`
   );
   return session;
+};
+
+export const checkInRoom = async (shopId, roomId, userId) => {
+  try {
+    const shop = await Shop.findById(shopId);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+    const existingSession = getSessionByRoomId(shop, roomId);
+    if (existingSession) {
+      throw new Error("Room is already occupied");
+    }
+    const updatedShop = await updateShopById(shopId, [
+      {
+        $set: {
+          sessions: [
+            ...shop.sessions,
+            {
+              roomId,
+              roomName: shop.rooms.find((room) => `${room._id}` === `${roomId}`)
+                .name,
+              startTime: new Date().toISOString(),
+              userId,
+            },
+          ],
+        },
+      },
+      {
+        $set: {
+          rooms: setRoomStatus(roomId, "occupied"),
+        },
+      },
+      {
+        // set numVacancies to number of rooms minus number of sessions
+        $set: {
+          numVacancies: setNumVacancies,
+        },
+      },
+    ]);
+    const session = getSessionByRoomId(updatedShop, roomId);
+    const returnValue = {
+      session,
+      numVacancies: updatedShop.numVacancies,
+    };
+    emitEvent(shopId, "checkIn", returnValue);
+    return returnValue;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const checkOutRoom = async (shopId, roomId) => {
+  try {
+    const updatedShop = await updateShopById(
+      shopId,
+      // increment numVacancies if <= capacity
+      [
+        {
+          $set: {
+            sessions: {
+              $filter: {
+                input: "$sessions",
+                as: "session",
+                cond: { $ne: ["$$session.roomId", roomId] },
+              },
+            },
+          },
+        },
+        {
+          $set: {
+            rooms: setRoomStatus(roomId, "available"),
+          },
+        },
+        {
+          $set: {
+            numVacancies: setNumVacancies,
+          },
+        },
+      ]
+    );
+    const returnValue = {
+      numVacancies: updatedShop.numVacancies,
+      roomId,
+    };
+    emitEvent(shopId, "checkOut", returnValue);
+    return returnValue;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 export const updateShopById = async (id, update, options = { new: true }) => {
