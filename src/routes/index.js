@@ -147,6 +147,33 @@ export default router;
  *                 type: string
  *               price:
  *                 type: number
+ *     ComputeTotal:
+ *       type: object
+ *       properties:
+ *         roomId:
+ *           type: string
+ *         extras:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *     ComputeTotalResponse:
+ *       type: object
+ *       properties:
+ *         startTime:
+ *           type: date
+ *         endTime:
+ *           type: date
+ *         timeTotal:
+ *           type: number
+ *         extrasTotal:
+ *           type: number
+ *         roomTotal:
+ *           type: number
  *     AddExtra:
  *       type: object
  *       properties:
