@@ -56,9 +56,9 @@ export default router;
  *       type: object
  *       properties:
  *         startTime:
- *           type: date
+ *           type: string
  *         endTime:
- *           type: date
+ *           type: string
  *         roomId:
  *           type: string
  *         userId:
@@ -165,9 +165,9 @@ export default router;
  *       type: object
  *       properties:
  *         startTime:
- *           type: date
+ *           type: string
  *         endTime:
- *           type: date
+ *           type: string
  *         timeTotal:
  *           type: number
  *         extrasTotal:
@@ -193,6 +193,15 @@ export default router;
  *       properties:
  *         name:
  *          type: string
+ *     Extras:
+ *       type: array
+ *       items:
+ *         type: object
+ *         properties:
+ *           name:
+ *             type: string
+ *           price:
+ *             type: number
  *     Room:
  *       type: object
  *       properties:
@@ -244,9 +253,9 @@ export default router;
  *             roomId:
  *               type: string
  *             startTime:
- *               type: date
+ *               type: string
  *             endTime:
- *              type: date
+ *              type: string
  *             userId:
  *               type: string
  *     CheckOutResponse:
