@@ -20,6 +20,39 @@ const router = express.Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ShopResponse'
+ * /shop_moderator/add_extra:
+ *   post:
+ *     summary: Add an extra to a shop
+ *     tags: [ShopModerator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AddExtra'
+ *     responses:
+ *       200:
+ *         description: OK
+ * /shop_moderator/remove_extra:
+ *   delete:
+ *     summary: Remove an extra from a shop
+ *     tags: [ShopModerator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RemoveExtra'
+ * /shop_moderator/update_extra:
+ *   put:
+ *     summary: Update an extra for a shop
+ *     tags: [ShopModerator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateExtra'
  * /shop_moderator/toggle_status:
  *   put:
  *     summary: Toggle the status of a shop moderator
@@ -130,6 +163,23 @@ const router = express.Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/RoomResponse'
+ * /shop_moderator/compute_total:
+ *   post:
+ *     summary: Compute the total price of a reservation
+ *     tags: [ShopModerator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ComputeTotal'
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ComputeTotalResponse'
  */
 router.get("/shop_info", shopController.getShopInfo);
 
@@ -165,6 +215,30 @@ router.post(
 router.delete(
   "/reservation/:reservation_id",
   shopController.deleteReservationById
+);
+
+router.post(
+  "/add_extra",
+  validateBody(shopValidation.addExtra),
+  shopController.addExtra
+);
+
+router.delete(
+  "/remove_extra",
+  validateBody(shopValidation.removeExtra),
+  shopController.removeExtra
+);
+
+router.put(
+  "/update_extra",
+  validateBody(shopValidation.updateExtra),
+  shopController.updateExtra
+);
+
+router.post(
+  "/compute_total",
+  validateBody(shopValidation.computeTotal),
+  shopController.computeSessionTotal
 );
 
 export default router;
