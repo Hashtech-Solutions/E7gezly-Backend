@@ -293,6 +293,40 @@ export const updateExtra = async (id, extra) => {
   }
 };
 
+const computeTimeTotal = (startTime, endTime, shop, roomId) => {
+  const room = shop.rooms.find((room) => `${room._id}` === `${roomId}`);
+  const timeTotal = (endTime - startTime) / 1000 / 60 / 60;
+  return room.hourlyRate
+    ? timeTotal * room.hourlyRate
+    : timeTotal * shop.baseHourlyRate;
+};
+
+const computeExtraTotal = (extras, shopExtras) => {
+  const extraTotal = extras.reduce((total, extra) => {
+    const shopExtra = shopExtras.find(
+      (shopExtra) => shopExtra.name === extra.name
+    );
+    return total + shopExtra.price * extra.quantity;
+  }, 0);
+  return extraTotal;
+};
+
+export const computeSessionTotal = async (id, roomId, extras) => {
+  const shop = await getShopById(id);
+  const session = getSessionByRoomId(shop, roomId);
+  const startTime = new Date(session.startTime);
+  const endTime = new Date();
+  const timeTotal = computeTimeTotal(startTime, endTime, shop, roomId);
+  const extrasTotal = computeExtraTotal(extras, shop.extras);
+  return {
+    startTime,
+    endTime,
+    timeTotal,
+    extraTotal: extrasTotal,
+    total: timeTotal + extrasTotal,
+  };
+};
+
 export const addRoom = async (id, room) => {
   try {
     const shop = await Shop.findById(id);
