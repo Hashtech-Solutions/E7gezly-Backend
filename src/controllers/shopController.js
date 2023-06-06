@@ -29,6 +29,38 @@ export const updateShopInfo = async (req, res, next) => {
   }
 };
 
+export const addExtra = async (req, res, next) => {
+  try {
+    const shopId = req.shopId;
+    const extras = await shopService.addExtra(shopId, req.body);
+    res.status(200).json(extras);
+  } catch (error) {
+    return next({ status: 400, message: error });
+  }
+};
+
+export const removeExtra = async (req, res, next) => {
+  try {
+    const shopId = req.shopId;
+    const extraName = req.params.extra_name;
+    const extras = await shopService.removeExtra(shopId, extraName);
+    res.status(200).json(extras);
+  } catch (error) {
+    return next({ status: 400, message: error });
+  }
+};
+
+export const updateExtra = async (req, res, next) => {
+  try {
+    const shopId = req.shopId;
+    const extra = req.body;
+    const extras = await shopService.updateExtra(shopId, extra);
+    res.status(200).json(extras);
+  } catch (error) {
+    return next({ status: 400, message: error });
+  }
+};
+
 export const createShopModerator = async (req, res, next) => {
   try {
     let { password } = req.body;

@@ -147,6 +147,25 @@ export default router;
  *                 type: string
  *               price:
  *                 type: number
+ *     AddExtra:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         price:
+ *           type: number
+ *     UpdateExtra:
+ *      type: object
+ *      properties:
+ *        name:
+ *          type: string
+ *        price:
+ *          type: number
+ *     RemoveExtra:
+ *       type: object
+ *       properties:
+ *         name:
+ *          type: string
  *     Room:
  *       type: object
  *       properties:

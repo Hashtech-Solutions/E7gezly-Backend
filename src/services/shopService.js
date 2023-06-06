@@ -245,6 +245,54 @@ export const updateShopById = async (id, update, options = { new: true }) => {
   }
 };
 
+export const addExtra = async (id, extra) => {
+  try {
+    const shop = await Shop.findById(id);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+    shop.extras.push(extra);
+    await shop.save();
+    return shop.extras;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const removeExtra = async (id, extraName) => {
+  try {
+    const shop = await Shop.findById(id);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+    shop.extras = shop.extras.filter((extra) => extra.name !== extraName);
+    await shop.save();
+    return shop.extras;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const updateExtra = async (id, extra) => {
+  try {
+    const shop = await Shop.findById(id);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+    const existingExtra = shop.extras.find(
+      (existingExtra) => existingExtra.name === extra.name
+    );
+    if (!existingExtra) {
+      throw new Error("Extra not found");
+    }
+    existingExtra.price = extra.price;
+    await shop.save();
+    return shop.extras;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const addRoom = async (id, room) => {
   try {
     const shop = await Shop.findById(id);

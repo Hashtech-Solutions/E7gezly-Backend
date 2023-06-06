@@ -20,6 +20,39 @@ const router = express.Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ShopResponse'
+ * /shop_moderator/add_extra:
+ *   post:
+ *     summary: Add an extra to a shop
+ *     tags: [ShopModerator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AddExtra'
+ *     responses:
+ *       200:
+ *         description: OK
+ * /shop_moderator/remove_extra:
+ *   delete:
+ *     summary: Remove an extra from a shop
+ *     tags: [ShopModerator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RemoveExtra'
+ * /shop_moderator/update_extra:
+ *   put:
+ *     summary: Update an extra for a shop
+ *     tags: [ShopModerator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateExtra'
  * /shop_moderator/toggle_status:
  *   put:
  *     summary: Toggle the status of a shop moderator
