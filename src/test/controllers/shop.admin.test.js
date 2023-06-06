@@ -109,6 +109,28 @@ describe("shop admin tests", () => {
     expect(res.statusCode).to.equal(400);
   });
 
+  it("should compute session total", async () => {
+    const req = {
+      shopId: shopId,
+      body: {
+        roomId,
+      },
+    };
+    const res = {
+      status: function (code) {
+        this.statusCode = code;
+        return this;
+      },
+      json: function (data) {
+        this.data = data;
+        return this;
+      },
+    };
+    await shopController.computeSessionTotal(req, res, errorHandler);
+    expect(res.statusCode).to.equal(200);
+    expect(res.data.roomTotal).to.equal(1);
+  });
+
   it("should check out test room", async () => {
     const req = {
       shopId: shopId,

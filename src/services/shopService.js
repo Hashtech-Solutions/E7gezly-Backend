@@ -296,9 +296,11 @@ export const updateExtra = async (id, extra) => {
 const computeTimeTotal = (startTime, endTime, shop, roomId) => {
   const room = shop.rooms.find((room) => `${room._id}` === `${roomId}`);
   const timeTotal = (endTime - startTime) / 1000 / 60 / 60;
-  return room.hourlyRate
-    ? timeTotal * room.hourlyRate
-    : timeTotal * shop.baseHourlyRate;
+  return Math.ceil(
+    room.hourlyRate
+      ? timeTotal * room.hourlyRate
+      : timeTotal * shop.baseHourlyRate
+  );
 };
 
 const computeExtraTotal = (extras, shopExtras) => {
@@ -308,23 +310,33 @@ const computeExtraTotal = (extras, shopExtras) => {
     );
     return total + shopExtra.price * extra.quantity;
   }, 0);
-  return extraTotal;
+  return Math.ceil(extraTotal);
 };
 
 export const computeSessionTotal = async (id, roomId, extras) => {
-  const shop = await getShopById(id);
-  const session = getSessionByRoomId(shop, roomId);
-  const startTime = new Date(session.startTime);
-  const endTime = new Date();
-  const timeTotal = computeTimeTotal(startTime, endTime, shop, roomId);
-  const extrasTotal = computeExtraTotal(extras, shop.extras);
-  return {
-    startTime,
-    endTime,
-    timeTotal,
-    extraTotal: extrasTotal,
-    total: timeTotal + extrasTotal,
-  };
+  try {
+    const shop = await getShopById(id);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+    const session = getSessionByRoomId(shop, roomId);
+    if (!session) {
+      throw new Error("Session not found");
+    }
+    const startTime = new Date(session.startTime);
+    const endTime = new Date();
+    const timeTotal = computeTimeTotal(startTime, endTime, shop, roomId);
+    const extrasTotal = extras ? computeExtraTotal(extras, shop.extras) : 0;
+    return {
+      startTime,
+      endTime,
+      timeTotal,
+      extraTotal: extrasTotal,
+      roomTotal: timeTotal + extrasTotal,
+    };
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 export const addRoom = async (id, room) => {
