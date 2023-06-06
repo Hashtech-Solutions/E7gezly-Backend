@@ -33,6 +33,10 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *              $ref: '#/components/schemas/Extras'
  * /shop_moderator/remove_extra:
  *   delete:
  *     summary: Remove an extra from a shop
@@ -43,6 +47,13 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/RemoveExtra'
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *              $ref: '#/components/schemas/Extras'
  * /shop_moderator/update_extra:
  *   put:
  *     summary: Update an extra for a shop
@@ -53,6 +64,24 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/UpdateExtra'
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *              $ref: '#/components/schemas/Extras'
+ * /shop_moderator/extras:
+ *   get:
+ *     summary: Get all extras for a shop
+ *     tags: [ShopModerator]
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *              $ref: '#/components/schemas/Extras'
  * /shop_moderator/toggle_status:
  *   put:
  *     summary: Toggle the status of a shop moderator
@@ -182,6 +211,8 @@ const router = express.Router();
  *               $ref: '#/components/schemas/ComputeTotalResponse'
  */
 router.get("/shop_info", shopController.getShopInfo);
+
+router.get("/extras", shopController.getShopExtras);
 
 router.get("/room", shopController.getShopRooms);
 

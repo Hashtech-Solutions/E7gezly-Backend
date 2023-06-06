@@ -20,6 +20,15 @@ export const getShopRooms = async (req, res, next) => {
   }
 };
 
+export const getShopExtras = async (req, res, next) => {
+  try {
+    const shop = await shopService.getShopById(req.shopId);
+    res.status(200).json(shop.extras);
+  } catch (error) {
+    return next({ status: 400, message: error });
+  }
+};
+
 export const updateShopInfo = async (req, res, next) => {
   try {
     const updatedShop = await shopService.updateShopById(req.shopId, req.body);
@@ -179,7 +188,12 @@ export const bookRoom = async (req, res, next) => {
 export const computeSessionTotal = async (req, res, next) => {
   try {
     const shopId = req.shopId;
-    const receipt = await shopService.computeSessionTotal(shopId, req.body);
+    const { roomId, extras } = req.body;
+    const receipt = await shopService.computeSessionTotal(
+      shopId,
+      roomId,
+      extras
+    );
     res.status(200).json(receipt);
   } catch (error) {
     return next({ status: 400, message: error }, req, res, next);
