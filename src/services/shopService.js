@@ -341,6 +341,30 @@ export const addRoom = async (id, room) => {
   }
 };
 
+export const updateRoom = async (id, roomId, room) => {
+  try {
+    const shop = await Shop.findById(id);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+    const existingRoom = shop.rooms.find(
+      (existingRoom) => `${existingRoom._id}` === `${roomId}`
+    );
+    if (!existingRoom) {
+      throw new Error("Room not found");
+    }
+    // update existing room with new room data
+    const updatedRoom = Object.assign(existingRoom, room);
+    shop.rooms = shop.rooms.map((r) =>
+      `${r._id}` === `${roomId}` ? updatedRoom : r
+    );
+    await shop.save();
+    return shop;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const deleteShopById = async (id) => {
   try {
     const deletedShop = await Shop.findByIdAndDelete(id);

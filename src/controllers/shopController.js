@@ -35,7 +35,7 @@ export const addExtra = async (req, res, next) => {
     const extras = await shopService.addExtra(shopId, req.body);
     res.status(200).json(extras);
   } catch (error) {
-    return next({ status: 400, message: error });
+    return next({ status: 400, message: error }, req, res, next);
   }
 };
 
@@ -104,16 +104,21 @@ export const addRoom = async (req, res, next) => {
 export const updateRoom = async (req, res, next) => {
   try {
     const roomId = req.params.room_id;
-    const updatedShop = await shopService.updateShopById(
+    // const updatedShop = await shopService.updateShopById(
+    //   req.shopId,
+    //   {
+    //     // set room to req.body
+    //     "rooms.$[elem]": {
+    //       ...req.body,
+    //       _id: roomId,
+    //     },
+    //   },
+    //   { arrayFilters: [{ "elem._id": roomId }], new: true }
+    // );
+    const updatedShop = await shopService.updateRoom(
       req.shopId,
-      {
-        // set room to req.body
-        "rooms.$[elem]": {
-          ...req.body,
-          _id: roomId,
-        },
-      },
-      { arrayFilters: [{ "elem._id": roomId }], new: true }
+      roomId,
+      req.body
     );
     res.status(200).json(updatedShop);
   } catch (error) {

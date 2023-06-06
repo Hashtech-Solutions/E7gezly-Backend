@@ -62,6 +62,29 @@ describe("shop admin tests", () => {
     expect(updatedRoom.hourlyRate).to.equal(10);
   });
 
+  it("should add extra to shop", async () => {
+    const req = {
+      shopId: shopId,
+      body: {
+        name: "test",
+        price: 10,
+      },
+    };
+    const res = {
+      status: function (code) {
+        this.statusCode = code;
+        return this;
+      },
+      json: function (data) {
+        this.data = data;
+        return this;
+      },
+    };
+    const extra = await shopController.addExtra(req, res, errorHandler);
+    expect(res.statusCode).to.equal(200);
+    expect(res.data).to.be.an("array");
+  });
+
   it("should check in test room", async () => {
     const req = {
       shopId: shopId,
