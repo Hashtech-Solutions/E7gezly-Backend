@@ -1,5 +1,6 @@
 import * as shopService from "../services/shopService.js";
 import * as reservationService from "../services/reservationService.js";
+import * as receiptService from "../services/receiptService.js";
 import bcrypt from "bcrypt";
 
 export const getShopInfo = async (req, res, next) => {
@@ -160,8 +161,22 @@ export const checkInRoom = async (req, res, next) => {
 
 export const checkOutRoom = async (req, res, next) => {
   try {
-    const { roomId } = req.body;
+    const { roomId, extras } = req.body;
     const { shopId } = req;
+    const receipt = await shopService.computeSessionTotal(
+      shopId,
+      roomId,
+      extras
+    );
+    await receiptService.createReceipt(
+      shopId,
+      roomId,
+      receipt.startTime,
+      receipt.endTime,
+      receipt.timeTotal,
+      receipt.extraTotal,
+      receipt.roomTotal
+    );
     const session = await shopService.checkOutRoom(shopId, roomId);
     res.status(200).json(session);
   } catch (error) {
