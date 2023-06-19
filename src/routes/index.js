@@ -242,6 +242,15 @@ export default router;
  *       properties:
  *         roomId:
  *           type: string
+ *         extras:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               price:
+ *                 type: number
  *     CheckInResponse:
  *       type: object
  *       properties:
@@ -371,6 +380,39 @@ export default router;
  *           items:
  *             type: string
  *           description: List of available activities in the shop.
+ *     ReceiptResponse:
+ *        type: object
+ *        properties:
+ *          shopId:
+ *            type: string
+ *            description: The ID of the shop.
+
+ *          roomId:
+ *            type: string
+ *            description: The ID of the room.
+
+ *          startTime:
+ *            type: string
+ *            format: date-time
+ *            description: The start time of the session.
+
+ *          endTime:
+ *            type: string
+ *            format: date-time   
+ *            description: The end time of the session.
+
+ *          timeTotal:
+ *            type: number
+ *            description: The price of the time of the session.
+
+ *          extraTotal:
+ *            type: number
+ *            description: The total price of the extras.
+
+ *          roomTotal:
+ *            type: number
+ *            description: The total price of the room.
+
  */
 
 /**

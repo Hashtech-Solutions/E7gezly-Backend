@@ -2,8 +2,11 @@ import express from "express";
 import * as shopController from "../controllers/shopController.js";
 import * as shopValidation from "../schemaValidations/shopValidation.js";
 import * as customerValidation from "../schemaValidations/customerValidation.js";
+import * as receiptController from "../controllers/receiptController.js";
 import validateBody from "../middleware/validateBody.js";
-import validateDate from "../middleware/validateDate.js";
+import validateDate, {
+  validateGetReceiptByDate,
+} from "../middleware/validateDate.js";
 
 const router = express.Router();
 
@@ -209,6 +212,136 @@ const router = express.Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ComputeTotalResponse'
+ *
+ * /shop_moderator/receipt:
+ *   get:
+ *     summary: Get all receipts for a shop or receipts in a date range if start_date and end_date are provided or invalid date format
+ *     tags: [ShopModerator]
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: yyyy-mm-dd
+ *         description: Start date of the date range
+ *         required: false
+ *         example: 2021-01-01
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: yyyy-mm-dd
+ *         description: End date of the date range
+ *         required: false
+ *         example: 2021-01-01
+ *     responses:
+ *      200:
+ *        description: OK
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/ReceiptResponse'
+ * /shop_moderator/receipt/{room_id}:
+ *   get:
+ *     summary: Get all receipts for a room or receipts in a date range if start_date and end_date are provided or invalid date format
+ *     tags: [ShopModerator]
+ *     parameters:
+ *       - in: path
+ *         name: room_id
+ *         schema:
+ *           type: string
+ *         description: ID of the room
+ *         required: true
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: yyyy-mm-dd
+ *         description: Start date of the date range
+ *         required: false
+ *         example: 2021-01-01
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: yyyy-mm-dd
+ *         description: End date of the date range
+ *         required: false
+ *         example: 2021-01-01
+ *     responses:
+ *      200:
+ *        description: OK
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/ReceiptResponse'
+ *
+ * /shop_moderator/receipt_total:
+ *   get:
+ *     summary: Get total revenue for a shop for all time or in a date range if start_date and end_date are provided or invalid date format
+ *     tags: [ShopModerator]
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: yyyy-mm-dd
+ *         description: Start date of the date range
+ *         required: false
+ *         example: 2021-01-01
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: yyyy-mm-dd
+ *         description: End date of the date range
+ *         required: false
+ *         example: 2021-01-01
+ *     responses:
+ *      200:
+ *        description: OK
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: number
+ * /shop_moderator/receipt_total/{room_id}:
+ *   get:
+ *     summary: Get total revenue for a room for all time or in a date range if start_date and end_date are provided or invalid date format
+ *     tags: [ShopModerator]
+ *     parameters:
+ *       - in: path
+ *         name: room_id
+ *         schema:
+ *           type: string
+ *         description: ID of the room
+ *         required: true
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: yyyy-mm-dd
+ *         description: Start date of the date range
+ *         required: false
+ *         example: 2021-01-01
+ *       - in: query
+ *         name: start_date
+ *         schema:
+ *           type: string
+ *           format: yyyy-mm-dd
+ *         description: End date of the date range
+ *         required: false
+ *         example: 2021-01-01
+ *     responses:
+ *      200:
+ *        description: OK
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: number
  */
 router.get("/shop_info", shopController.getShopInfo);
 
@@ -270,6 +403,30 @@ router.post(
   "/compute_total",
   validateBody(shopValidation.computeTotal),
   shopController.computeSessionTotal
+);
+
+router.get(
+  "/receipt/:room_id",
+  validateGetReceiptByDate,
+  receiptController.getReceiptsByRoomId
+);
+
+router.get(
+  "/receipt",
+  validateGetReceiptByDate,
+  receiptController.getReceiptsByShopId
+);
+
+router.get(
+  "/receipt_total/:room_id",
+  validateGetReceiptByDate,
+  receiptController.getRoomTotal
+);
+
+router.get(
+  "/receipt_total",
+  validateGetReceiptByDate,
+  receiptController.getShopTotal
 );
 
 export default router;
