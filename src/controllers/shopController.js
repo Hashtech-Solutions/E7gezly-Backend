@@ -1,5 +1,6 @@
 import * as shopService from "../services/shopService.js";
 import * as reservationService from "../services/reservationService.js";
+import * as receiptService from "../services/receiptService.js";
 import bcrypt from "bcrypt";
 
 export const getShopInfo = async (req, res, next) => {
@@ -7,7 +8,7 @@ export const getShopInfo = async (req, res, next) => {
     const shop = await shopService.getShopById(req.shopId);
     res.status(200).json(shop);
   } catch (error) {
-    return next({ status: 400, message: error });
+    return next({status: 400, message: error});
   }
 };
 
@@ -16,7 +17,7 @@ export const getShopRooms = async (req, res, next) => {
     const shop = await shopService.getShopById(req.shopId);
     res.status(200).json(shop.rooms);
   } catch (error) {
-    return next({ status: 400, message: error });
+    return next({status: 400, message: error});
   }
 };
 
@@ -25,7 +26,7 @@ export const getShopExtras = async (req, res, next) => {
     const shop = await shopService.getShopById(req.shopId);
     res.status(200).json(shop.extras);
   } catch (error) {
-    return next({ status: 400, message: error });
+    return next({status: 400, message: error});
   }
 };
 
@@ -34,7 +35,7 @@ export const updateShopInfo = async (req, res, next) => {
     const updatedShop = await shopService.updateShopById(req.shopId, req.body);
     res.status(200).json(updatedShop);
   } catch (error) {
-    return next({ status: 400, message: error });
+    return next({status: 400, message: error});
   }
 };
 
@@ -44,18 +45,18 @@ export const addExtra = async (req, res, next) => {
     const extras = await shopService.addExtra(shopId, req.body);
     res.status(200).json(extras);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
 export const removeExtra = async (req, res, next) => {
   try {
     const shopId = req.shopId;
-    const extraName = req.params.extra_name;
-    const extras = await shopService.removeExtra(shopId, extraName);
+    const {name} = req.body;
+    const extras = await shopService.removeExtra(shopId, name);
     res.status(200).json(extras);
   } catch (error) {
-    return next({ status: 400, message: error });
+    return next({status: 400, message: error});
   }
 };
 
@@ -66,13 +67,13 @@ export const updateExtra = async (req, res, next) => {
     const extras = await shopService.updateExtra(shopId, extra);
     res.status(200).json(extras);
   } catch (error) {
-    return next({ status: 400, message: error });
+    return next({status: 400, message: error});
   }
 };
 
 export const createShopModerator = async (req, res, next) => {
   try {
-    let { password } = req.body;
+    let {password} = req.body;
     password = await bcrypt.hash(password, 10);
     const shopModerator = await shopService.createShopModerator({
       ...req.body,
@@ -82,7 +83,7 @@ export const createShopModerator = async (req, res, next) => {
     });
     res.status(200).json(shopModerator);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
@@ -94,7 +95,7 @@ export const removeShopModerator = async (req, res, next) => {
     );
     res.status(200).json(shopModerator);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
@@ -106,7 +107,7 @@ export const addRoom = async (req, res, next) => {
     });
     res.status(200).json(room);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
@@ -131,48 +132,62 @@ export const updateRoom = async (req, res, next) => {
     );
     res.status(200).json(updatedShop);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
 export const toggleStatus = async (req, res, next) => {
   try {
-    const { isOpen } = req.body;
+    const {isOpen} = req.body;
     const updatedShop = await shopService.updateShopById(req.shopId, [
-      { $set: { isOpen } },
+      {$set: {isOpen}},
     ]);
     res.status(200).json(updatedShop);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
 export const checkInRoom = async (req, res, next) => {
   try {
-    const { roomId, userId } = req.body;
-    const { shopId } = req;
+    const {roomId, userId} = req.body;
+    const {shopId} = req;
     const session = await shopService.checkInRoom(shopId, roomId, userId);
     res.status(200).json(session);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
 export const checkOutRoom = async (req, res, next) => {
   try {
-    const { roomId } = req.body;
-    const { shopId } = req;
+    const {roomId, extras} = req.body;
+    const {shopId} = req;
+    const receipt = await shopService.computeSessionTotal(
+      shopId,
+      roomId,
+      extras
+    );
+    await receiptService.createReceipt(
+      shopId,
+      roomId,
+      receipt.startTime,
+      receipt.endTime,
+      receipt.timeTotal,
+      receipt.extraTotal,
+      receipt.roomTotal
+    );
     const session = await shopService.checkOutRoom(shopId, roomId);
     res.status(200).json(session);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
 export const bookRoom = async (req, res, next) => {
   try {
     const shopId = req.shopId;
-    const { roomId, startTime, endTime } = req.body;
+    const {roomId, startTime, endTime} = req.body;
     const reservation = await reservationService.createReservation({
       shopId,
       roomId,
@@ -181,14 +196,14 @@ export const bookRoom = async (req, res, next) => {
     });
     res.status(200).json(reservation);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
 export const computeSessionTotal = async (req, res, next) => {
   try {
     const shopId = req.shopId;
-    const { roomId, extras } = req.body;
+    const {roomId, extras} = req.body;
     const receipt = await shopService.computeSessionTotal(
       shopId,
       roomId,
@@ -196,7 +211,7 @@ export const computeSessionTotal = async (req, res, next) => {
     );
     res.status(200).json(receipt);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
@@ -208,6 +223,6 @@ export const deleteReservationById = async (req, res, next) => {
     );
     res.status(200).json(reservation);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    return next({status: 400, message: error}, req, res, next);
   }
 };
