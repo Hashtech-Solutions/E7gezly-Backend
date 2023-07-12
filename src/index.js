@@ -18,12 +18,13 @@ const server = createServer(app);
 app.set("trust proxy", 1);
 app.use(express.json());
 // should be changed in production
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: true,
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
 
 app.use(sessionMiddleware);
 
