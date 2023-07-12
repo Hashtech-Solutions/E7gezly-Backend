@@ -1,5 +1,6 @@
 import { Reservation } from "../models/Reservation.js";
 import Shop from "../models/Shop.js";
+import { emitEvent } from "../socket.js";
 
 const validateOverlappingReservations = async (reservation) => {
   try {
@@ -48,7 +49,7 @@ const removeReservationFromRoom = async (reservationId, shop) => {
   try {
     const room = shop.rooms[0];
     room.reservations = room.reservations.filter(
-      (reservation) => reservation._id.toString() !== reservationId
+      (reservation) => `${reservation._id}` !== `${reservationId}`
     );
     await shop.save();
   } catch (error) {
@@ -60,8 +61,9 @@ export const createReservation = async (reservation) => {
   try {
     await validateOverlappingReservations(reservation);
     const shop = await getShopRoom(reservation.shopId, reservation.roomId);
-    await addReservationToRoom(reservation, shop);
     const newReservation = await Reservation.create(reservation);
+    await addReservationToRoom(newReservation, shop);
+    emitEvent(reservation.shopId, "addReservation", newReservation);
     return newReservation;
   } catch (error) {
     throw new Error(error);
@@ -85,6 +87,7 @@ export const deleteReservationById = async (reservationId) => {
     }
     const shop = await getShopRoom(reservation.shopId, reservation.roomId);
     await removeReservationFromRoom(reservationId, shop);
+    emitEvent(reservation.shopId, "deleteReservation", reservationId);
     return reservation;
   } catch (error) {
     throw new Error(error);

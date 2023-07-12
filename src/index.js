@@ -1,41 +1,33 @@
-import express, { application } from "express";
+import express from "express";
+import { createServer } from "http";
+import sessionMiddleware from "./config/sessionMiddleware.js";
 import connectDB from "./config/database.js";
 import dotenv from "dotenv";
 import cors from "cors";
 import errorHandler from "./middleware/errorHandler.js";
 import router from "./routes/index.js";
-import session from "express-session";
 import passport from "passport";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import { initConnection } from "./socket.js";
 
 dotenv.config();
 
 const app = express();
+const server = createServer(app);
 app.set("trust proxy", 1);
 app.use(express.json());
 // should be changed in production
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: true,
+  credentials: true,
+};
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    // should be changed in production
-    cookie: {
-      secure: process.env.NODE_ENV === "local" ? false : true,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-      httpOnly: process.env.NODE_ENV === "local" ? false : true,
-      sameSite: "none",
-    },
-  })
-);
+app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
+
+app.use(sessionMiddleware);
 
 connectDB();
 app.use(passport.initialize());
@@ -75,6 +67,8 @@ if (process.env.NODE_ENV !== "production") {
 app.use("/api", router);
 app.use(errorHandler);
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+initConnection(server);
+
+server.listen(3000, () => console.log("Server running on port 3000"));
 
 export default app;

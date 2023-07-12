@@ -32,23 +32,6 @@ router.use("/customer", passport.authorize("customer"), customer);
 
 export default router;
 
-/*
- * @swagger
- * components:
- *   schemas:
- *     RoomResponse:
- *       type: object
- *       properties:
- *         _id:
- *           type: string
- *         roomType:
- *           type: string
- *           enum:
- *             - 'type1'
- *             - 'type2'
- *             - 'type3'
- */
-
 /**
  * @swagger
  * components:
@@ -73,9 +56,9 @@ export default router;
  *       type: object
  *       properties:
  *         startTime:
- *           type: date
+ *           type: string
  *         endTime:
- *           type: date
+ *           type: string
  *         roomId:
  *           type: string
  *         userId:
@@ -164,6 +147,61 @@ export default router;
  *                 type: string
  *               price:
  *                 type: number
+ *     ComputeTotal:
+ *       type: object
+ *       properties:
+ *         roomId:
+ *           type: string
+ *         extras:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *     ComputeTotalResponse:
+ *       type: object
+ *       properties:
+ *         startTime:
+ *           type: string
+ *         endTime:
+ *           type: string
+ *         timeTotal:
+ *           type: number
+ *         extrasTotal:
+ *           type: number
+ *         roomTotal:
+ *           type: number
+ *     AddExtra:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         price:
+ *           type: number
+ *     UpdateExtra:
+ *      type: object
+ *      properties:
+ *        name:
+ *          type: string
+ *        price:
+ *          type: number
+ *     RemoveExtra:
+ *       type: object
+ *       properties:
+ *         name:
+ *          type: string
+ *     Extras:
+ *       type: array
+ *       items:
+ *         type: object
+ *         properties:
+ *           name:
+ *             type: string
+ *           price:
+ *             type: number
  *     Room:
  *       type: object
  *       properties:
@@ -202,6 +240,38 @@ export default router;
  *     CheckOut:
  *       type: object
  *       properties:
+ *         roomId:
+ *           type: string
+ *         extras:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *     CheckInResponse:
+ *       type: object
+ *       properties:
+ *         numVacancies:
+ *           type: number
+ *         session:
+ *           type: object
+ *           properties:
+ *             roomId:
+ *               type: string
+ *             startTime:
+ *               type: string
+ *             endTime:
+ *              type: string
+ *             userId:
+ *               type: string
+ *     CheckOutResponse:
+ *       type: object
+ *       properties:
+ *         numVacancies:
+ *           type: number
  *         roomId:
  *           type: string
  *     ShopResponse:
@@ -310,6 +380,39 @@ export default router;
  *           items:
  *             type: string
  *           description: List of available activities in the shop.
+ *     ReceiptResponse:
+ *        type: object
+ *        properties:
+ *          shopId:
+ *            type: string
+ *            description: The ID of the shop.
+
+ *          roomId:
+ *            type: string
+ *            description: The ID of the room.
+
+ *          startTime:
+ *            type: string
+ *            format: date-time
+ *            description: The start time of the session.
+
+ *          endTime:
+ *            type: string
+ *            format: date-time   
+ *            description: The end time of the session.
+
+ *          timeTotal:
+ *            type: number
+ *            description: The price of the time of the session.
+
+ *          extraTotal:
+ *            type: number
+ *            description: The total price of the extras.
+
+ *          roomTotal:
+ *            type: number
+ *            description: The total price of the room.
+
  */
 
 /**

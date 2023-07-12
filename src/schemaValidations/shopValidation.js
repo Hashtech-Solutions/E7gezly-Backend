@@ -12,6 +12,30 @@ export const shopSchema = Joi.object({
   password: Joi.string().min(8).required(),
 });
 
+export const addExtra = Joi.object({
+  name: Joi.string().required(),
+  price: Joi.number().required(),
+});
+
+export const updateExtra = Joi.object({
+  name: Joi.string().required(),
+  price: Joi.number().required(),
+});
+
+export const removeExtra = Joi.object({
+  name: Joi.string().required(),
+});
+
+export const computeTotal = Joi.object({
+  roomId: Joi.string().required(),
+  extras: Joi.array().items(
+    Joi.object({
+      name: Joi.string().required(),
+      quantity: Joi.number().required(),
+    })
+  ),
+});
+
 export const shopModeratorSchema = Joi.object({
   userName: Joi.string().required(),
   password: Joi.string().min(8).required(),
