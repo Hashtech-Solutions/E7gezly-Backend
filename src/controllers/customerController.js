@@ -1,6 +1,7 @@
 import * as shopService from "../services/shopService.js";
 import * as reservationService from "../services/reservationService.js";
-
+import * as userService from "../services/userService.js";
+import bcrypt from "bcrypt";
 export const getManyShops = async (req, res, next) => {
   try {
     const query = req.query;
@@ -57,5 +58,53 @@ export const getCustomerReservations = async (req, res, next) => {
     res.status(200).json(reservations);
   } catch (error) {
     return next({ status: 400, message: error });
+  }
+};
+
+export const getCustomerProfile = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const user = await userService.getUserById(userId);
+    res.status(200).json({ userName: user.userName });
+  } catch (error) {
+    res.status(400).json({ message: error });
+    return next({ status: 400, message: error }, req, res, next);
+  }
+};
+
+export const updateCustomerProfile = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const user = await userService.getUserById(userId);
+    const { userName, oldPassword } = req.body;
+    let { newPassword } = req.body;
+    if (userName) {
+      const user = await userService.getUserByUserName(userName);
+      if (user) {
+        return next(
+          { status: 400, message: "Username already exists" },
+          req,
+          res,
+          next
+        );
+      }
+    }
+    if (oldPassword) {
+      if (!(await bcrypt.compare(oldPassword, user.password))) {
+        return next(
+          { status: 400, message: "Incorrect old password" },
+          req,
+          res,
+          next
+        );
+      }
+      newPassword = await bcrypt.hash(newPassword, 10);
+    }
+    user.userName = userName || user.userName;
+    user.password = newPassword || user.password;
+    await userService.updateUser(userId, user);
+    res.status(200).json(user);
+  } catch (error) {
+    return next({ status: 400, message: error }, req, res, next);
   }
 };

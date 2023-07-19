@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import Shop from "../models/Shop.js";
 import errorHandler from "../middleware/errorHandler.js";
 import * as adminController from "../controllers/adminController.js";
-
+import bcrypt from "bcrypt";
 dotenv.config();
 
 // have shopId as global variable to use in all tests
@@ -51,7 +51,7 @@ before(async () => {
   global.room2Id = res.data.rooms[1]._id;
   const customer = await User.create({
     userName: "customer",
-    password: "test",
+    password: bcrypt.hashSync("test", 10),
     role: "customer",
   });
   global.customerId = customer._id;
