@@ -1,5 +1,5 @@
 import express from "express";
-import { createServer } from "http";
+import {createServer} from "http";
 import sessionMiddleware from "./config/sessionMiddleware.js";
 import connectDB from "./config/database.js";
 import dotenv from "dotenv";
@@ -9,7 +9,9 @@ import router from "./routes/index.js";
 import passport from "passport";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
-import { initConnection } from "./socket.js";
+import {initConnection} from "./socket.js";
+import cron from "node-cron";
+import {Reservation} from "./models/Reservation.js";
 
 dotenv.config();
 
@@ -56,7 +58,7 @@ if (process.env.NODE_ENV !== "production") {
     app.use(
       "/api-docs",
       swaggerUi.serve,
-      swaggerUi.setup(specs, { explorer: true })
+      swaggerUi.setup(specs, {explorer: true})
     );
   } catch (err) {
     console.log(err);
@@ -65,6 +67,15 @@ if (process.env.NODE_ENV !== "production") {
 
 app.use("/api", router);
 app.use(errorHandler);
+
+cron.schedule("0 0 * * *", () => {
+  // delete reservations that have passed for more than 30 minutes
+  Reservation.deleteMany({
+    endTime: {
+      $lt: new Date(new Date().getTime() - 30 * 60 * 1000),
+    },
+  });
+});
 
 initConnection(server);
 
