@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import Shop from "../models/Shop.js";
 import mongoose from "mongoose";
-import { emitEvent } from "../socket.js";
+import {emitEvent} from "../socket.js";
 
 const setNumVacancies = {
   $size: {
@@ -21,7 +21,7 @@ const setRoomStatus = (roomId, status) => ({
     as: "room",
     in: {
       $cond: {
-        if: { $eq: ["$$room._id", roomId] },
+        if: {$eq: ["$$room._id", roomId]},
         then: {
           $mergeObjects: [
             "$$room",
@@ -77,7 +77,7 @@ export const createShopModerator = async (shopModerator) => {
           },
         },
       },
-      { session: session, new: true }
+      {session: session, new: true}
     );
     await session.commitTransaction();
     session.endSession();
@@ -106,7 +106,7 @@ export const removeShopModerator = async (shopModeratorId) => {
           },
         },
       },
-      { session: session, new: true }
+      {session: session, new: true}
     );
     await session.commitTransaction();
     session.endSession();
@@ -204,7 +204,21 @@ export const checkOutRoom = async (shopId, roomId) => {
               $filter: {
                 input: "$sessions",
                 as: "session",
-                cond: { $ne: ["$$session.roomId", roomId] },
+                cond: {$ne: ["$$session.roomId", roomId]},
+              },
+            },
+          },
+        },
+        // filter out reservations with startTime < now
+        {
+          $set: {
+            reservations: {
+              $filter: {
+                input: "$reservations",
+                as: "reservation",
+                cond: {
+                  $gt: ["$$reservation.startTime", new Date().toISOString()],
+                },
               },
             },
           },
@@ -232,13 +246,9 @@ export const checkOutRoom = async (shopId, roomId) => {
   }
 };
 
-export const updateShopById = async (id, update, options = { new: true }) => {
+export const updateShopById = async (id, update, options = {new: true}) => {
   try {
-    const updatedShop = await Shop.findOneAndUpdate(
-      { _id: id },
-      update,
-      options
-    );
+    const updatedShop = await Shop.findOneAndUpdate({_id: id}, update, options);
     return updatedShop;
   } catch (error) {
     throw new Error(error);
