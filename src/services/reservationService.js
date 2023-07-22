@@ -1,13 +1,13 @@
-import { Reservation } from "../models/Reservation.js";
+import {Reservation} from "../models/Reservation.js";
 import Shop from "../models/Shop.js";
-import { emitEvent } from "../socket.js";
+import {emitEvent} from "../socket.js";
 
 const validateOverlappingReservations = async (reservation) => {
   try {
     const existingReservations = await Reservation.find({
       roomId: reservation.roomId,
-      startTime: { $lt: reservation.endTime },
-      endTime: { $gt: reservation.startTime },
+      startTime: {$lt: reservation.endTime},
+      endTime: {$gt: reservation.startTime},
     });
     if (existingReservations.length > 0) {
       throw new Error("Room is already reserved");
@@ -22,9 +22,9 @@ const getShopRoom = async (shopId, roomId) => {
     const shop = await Shop.findOne(
       {
         _id: shopId,
-        rooms: { $elemMatch: { _id: roomId } },
+        rooms: {$elemMatch: {_id: roomId}},
       },
-      { rooms: { $elemMatch: { _id: roomId } } }
+      {rooms: {$elemMatch: {_id: roomId}}}
     );
     if (!shop) {
       throw new Error("Room does not exist");
@@ -88,6 +88,29 @@ export const deleteReservationById = async (reservationId) => {
     const shop = await getShopRoom(reservation.shopId, reservation.roomId);
     await removeReservationFromRoom(reservationId, shop);
     emitEvent(reservation.shopId, "deleteReservation", reservationId);
+    if (reservation.userId) {
+      emitCustomerEvent(reservation.userId, "deleteReservation", reservationId);
+    }
+    return reservation;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const confirmReservationById = async (reservationId) => {
+  try {
+    const reservation = await Reservation.findByIdAndUpdate(
+      reservationId,
+      {confirmed: true},
+      {new: true}
+    );
+    if (!reservation) {
+      throw new Error("Reservation does not exist");
+    }
+    emitEvent(reservation.shopId, "confirmReservation", reservation);
+    if (reservation.userId) {
+      emitCustomerEvent(reservation.userId, "confirmReservation", reservation);
+    }
     return reservation;
   } catch (error) {
     throw new Error(error);

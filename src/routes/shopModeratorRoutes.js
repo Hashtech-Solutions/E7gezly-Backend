@@ -381,6 +381,11 @@ router.delete(
   shopController.deleteReservationById
 );
 
+router.put(
+  "/reservation/:reservation_id/confirm",
+  shopController.confirmReservationById
+);
+
 router.post(
   "/add_extra",
   validateBody(shopValidation.addExtra),

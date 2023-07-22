@@ -27,6 +27,10 @@ export const reservationSchema = mongoose.Schema({
     required: false,
     index: true,
   },
+  confirmed: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export const Reservation = mongoose.model("Reservation", reservationSchema);
