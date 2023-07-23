@@ -36,6 +36,36 @@ const setRoomStatus = (roomId, status) => ({
   },
 });
 
+const setRoomCheckout = (roomId, status) => ({
+  $map: {
+    input: "$rooms",
+    as: "room",
+    in: {
+      $cond: {
+        if: {$eq: ["$$room._id", roomId]},
+        then: {
+          $mergeObjects: [
+            "$$room",
+            {
+              reservations: {
+                $filter: {
+                  input: "$$room.reservations",
+                  as: "reservation",
+                  cond: {
+                    $gt: ["$$reservation.startTime", new Date()],
+                  },
+                },
+              },
+              status: status,
+            },
+          ],
+        },
+        else: "$$room",
+      },
+    },
+  },
+});
+
 export const createShop = async (shop, shopAdmin) => {
   let shopAdminId;
   try {
@@ -207,30 +237,12 @@ export const checkOutRoom = async (shopId, roomId) => {
                 cond: {$ne: ["$$session.roomId", roomId]},
               },
             },
-          },
-        },
-        // filter out reservations with startTime < now
-        {
-          $set: {
-            reservations: {
-              $filter: {
-                input: "$reservations",
-                as: "reservation",
-                cond: {
-                  $gt: ["$$reservation.startTime", new Date().toISOString()],
-                },
-              },
-            },
+            rooms: setRoomCheckout(roomId, "available"), // filter out reservations with startTime < now and set room status to available
           },
         },
         {
           $set: {
-            rooms: setRoomStatus(roomId, "available"),
-          },
-        },
-        {
-          $set: {
-            numVacancies: setNumVacancies,
+            numVacancies: setNumVacancies, // after the first $set is executed, numVacancies is updated
           },
         },
       ]
