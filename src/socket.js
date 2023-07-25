@@ -1,9 +1,10 @@
-import { Server } from "socket.io";
+import {Server} from "socket.io";
 import passport from "passport";
 import sessionMiddleware from "./config/sessionMiddleware.js";
 
 let ioInstance = null;
 const clientsByShopId = {};
+const clientsByUserId = {};
 
 export const getIo = (server) => {
   if (!ioInstance) {
@@ -42,9 +43,23 @@ export const initConnection = (server) => {
       clientsByShopId[shopId].add(socket.id);
     });
 
+    socket.on("subscribeUser", () => {
+      const userId = socket.request.user._id;
+      if (!clientsByUserId[userId]) {
+        clientsByUserId[userId] = new Set();
+      }
+      clientsByUserId[userId].add(socket.id);
+    });
+
     socket.on("unsubscribe", (shopId) => {
       if (clientsByShopId[shopId]) {
         clientsByShopId[shopId].delete(socket.id);
+      }
+    });
+
+    socket.on("unsubscribeUser", (userId) => {
+      if (clientsByUserId[userId]) {
+        clientsByUserId[userId].delete(socket.id);
       }
     });
 
@@ -60,6 +75,14 @@ export const initConnection = (server) => {
 export const emitEvent = (shopId, event, data) => {
   if (clientsByShopId[shopId] && ioInstance) {
     clientsByShopId[shopId].forEach((clientId) => {
+      ioInstance.to(clientId).emit(event, data);
+    });
+  }
+};
+
+export const emitCustomerEvent = (userId, event, data) => {
+  if (clientsByUserId[userId] && ioInstance) {
+    clientsByUserId[userId].forEach((clientId) => {
       ioInstance.to(clientId).emit(event, data);
     });
   }

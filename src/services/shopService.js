@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import Shop from "../models/Shop.js";
 import mongoose from "mongoose";
-import { emitEvent } from "../socket.js";
+import {emitEvent} from "../socket.js";
 
 const setNumVacancies = {
   $size: {
@@ -21,11 +21,41 @@ const setRoomStatus = (roomId, status) => ({
     as: "room",
     in: {
       $cond: {
-        if: { $eq: ["$$room._id", roomId] },
+        if: {$eq: ["$$room._id", roomId]},
         then: {
           $mergeObjects: [
             "$$room",
             {
+              status: status,
+            },
+          ],
+        },
+        else: "$$room",
+      },
+    },
+  },
+});
+
+const setRoomCheckout = (roomId, status) => ({
+  $map: {
+    input: "$rooms",
+    as: "room",
+    in: {
+      $cond: {
+        if: {$eq: ["$$room._id", roomId]},
+        then: {
+          $mergeObjects: [
+            "$$room",
+            {
+              reservations: {
+                $filter: {
+                  input: "$$room.reservations",
+                  as: "reservation",
+                  cond: {
+                    $gt: ["$$reservation.startTime", new Date()],
+                  },
+                },
+              },
               status: status,
             },
           ],
@@ -77,7 +107,7 @@ export const createShopModerator = async (shopModerator) => {
           },
         },
       },
-      { session: session, new: true }
+      {session: session, new: true}
     );
     await session.commitTransaction();
     session.endSession();
@@ -106,7 +136,7 @@ export const removeShopModerator = async (shopModeratorId) => {
           },
         },
       },
-      { session: session, new: true }
+      {session: session, new: true}
     );
     await session.commitTransaction();
     session.endSession();
@@ -204,19 +234,15 @@ export const checkOutRoom = async (shopId, roomId) => {
               $filter: {
                 input: "$sessions",
                 as: "session",
-                cond: { $ne: ["$$session.roomId", roomId] },
+                cond: {$ne: ["$$session.roomId", roomId]},
               },
             },
+            rooms: setRoomCheckout(roomId, "available"), // filter out reservations with startTime < now and set room status to available
           },
         },
         {
           $set: {
-            rooms: setRoomStatus(roomId, "available"),
-          },
-        },
-        {
-          $set: {
-            numVacancies: setNumVacancies,
+            numVacancies: setNumVacancies, // after the first $set is executed, numVacancies is updated
           },
         },
       ]
@@ -232,13 +258,9 @@ export const checkOutRoom = async (shopId, roomId) => {
   }
 };
 
-export const updateShopById = async (id, update, options = { new: true }) => {
+export const updateShopById = async (id, update, options = {new: true}) => {
   try {
-    const updatedShop = await Shop.findOneAndUpdate(
-      { _id: id },
-      update,
-      options
-    );
+    const updatedShop = await Shop.findOneAndUpdate({_id: id}, update, options);
     return updatedShop;
   } catch (error) {
     throw new Error(error);

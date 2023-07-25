@@ -30,6 +30,7 @@ before(async () => {
         {
           name: "room2",
           status: "available",
+          hourlyRate: 10,
         },
       ],
       availableActivities: ["ps4"],

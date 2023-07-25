@@ -193,7 +193,20 @@ export const bookRoom = async (req, res, next) => {
       roomId,
       startTime,
       endTime,
+      confirmed: true,
     });
+    res.status(200).json(reservation);
+  } catch (error) {
+    return next({status: 400, message: error}, req, res, next);
+  }
+};
+
+export const confirmReservationById = async (req, res, next) => {
+  try {
+    const reservationId = req.params.reservation_id;
+    const reservation = await reservationService.confirmReservationById(
+      reservationId
+    );
     res.status(200).json(reservation);
   } catch (error) {
     return next({status: 400, message: error}, req, res, next);
