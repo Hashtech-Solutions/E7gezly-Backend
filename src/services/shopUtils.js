@@ -1,5 +1,6 @@
 import GameSearch from "../models/GameSearch.js";
 import dotenv from "dotenv";
+import axios from "axios";
 
 dotenv.config();
 
@@ -10,9 +11,8 @@ export const checkDatabaseForGameSearch = async (searchTerm) => {
 
 export const checkAPIForGameSearch = async (searchTerm) => {
   const key = process.env.API_KEY;
-  const url = `https://api.rawg.io/games?key=${key}&search=${searchTerm}`;
-  const response = await fetch(url);
-  const data = await response.json();
+  const url = `https://api.rawg.io/api/games?key=${key}&search=${searchTerm}`;
+  const {data} = await axios.get(url);
   return data;
 };
 

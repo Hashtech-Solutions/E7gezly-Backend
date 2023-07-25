@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.1381.0",
+    "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "chai": "^4.3.7",
     "connect-mongo": "^5.0.0",
