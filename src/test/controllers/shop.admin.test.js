@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import {expect} from "chai";
 import * as shopController from "../../controllers/shopController.js";
 import errorHandler from "../../middleware/errorHandler.js";
 import * as receiptController from "../../controllers/receiptController.js";
@@ -149,7 +149,7 @@ describe("shop admin tests", () => {
       await receiptController.getReceiptsByShopId(req, res, errorHandler);
       expect(res.statusCode).to.equal(200);
       expect(res.data).to.be.an("array");
-      expect(res.data.length).to.equal(1);
+      expect(res.data.length).to.equal(2);
       expect(res.data[0].roomTotal).to.equal(1);
     });
 
@@ -197,7 +197,7 @@ describe("shop admin tests", () => {
       };
       await receiptController.getShopTotal(req, res, errorHandler);
       expect(res.statusCode).to.equal(200);
-      expect(res.data).to.equal(1);
+      expect(res.data).to.equal(2);
     });
     it("should get room total by date range", async () => {
       const req = {
@@ -241,7 +241,7 @@ describe("shop admin tests", () => {
       };
       await receiptController.getShopTotal(req, res, errorHandler);
       expect(res.statusCode).to.equal(200);
-      expect(res.data).to.equal(1);
+      expect(res.data).to.equal(2);
     });
 
     it("should get room total", async () => {

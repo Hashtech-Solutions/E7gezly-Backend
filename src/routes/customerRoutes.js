@@ -68,6 +68,36 @@ const router = express.Router();
  *           type: array
  *           items:
  *             $ref: '#/components/schemas/Reservation'
+ * /customer/profile:
+ *   get:
+ *     summary: Retrieve customer profile
+ *     tags: [Customer]
+ *     responses:
+ *       200:
+ *         description: Successful operation
+ *         schema:
+ *           type: string
+ *           items:
+ *             userName: string
+ *   put:
+ *     summary: Update customer profile
+ *     tags: [Customer]
+ *     requestBody:
+ *       required: true
+ *       description: Update customer profile, should send userName or [oldPassword, newPassword] or all of them
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateProfileRequest'
+ *     responses:
+ *       200:
+ *        description: Successful operation if update userName or password or both
+ *       400:
+ *        description: Bad request if not send either userName or [oldPassword, newPassword] or userName exists or oldPassword is wrong
+ *
+ *
+ *
+ *
  */
 router.get("/shop", customerController.getManyShops);
 
@@ -82,4 +112,11 @@ router.post(
 
 router.get("/reservation", customerController.getCustomerReservations);
 
+router.get("/profile", customerController.getCustomerProfile);
+
+router.put(
+  "/profile",
+  validateBody(customerValidation.updateProfile),
+  customerController.updateCustomerProfile
+);
 export default router;

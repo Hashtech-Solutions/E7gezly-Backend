@@ -414,7 +414,20 @@ export default router;
  *            description: The total price of the room.
 
  */
-
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     UpdateProfileRequest:
+ *       type: object
+ *       properties:
+ *         userName:
+ *           type: string
+ *         oldPassword:
+ *           type: string
+ *         newPassword:
+ *           type: string
+ */
 /**
  * @swagger
  * components:

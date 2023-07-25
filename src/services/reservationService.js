@@ -1,6 +1,6 @@
 import {Reservation} from "../models/Reservation.js";
 import Shop from "../models/Shop.js";
-import {emitEvent} from "../socket.js";
+import {emitEvent, emitCustomerEvent} from "../socket.js";
 
 const validateOverlappingReservations = async (reservation) => {
   try {
@@ -97,6 +97,21 @@ export const deleteReservationById = async (reservationId) => {
   }
 };
 
+export const confirmRoomReservation = async (reservation) => {
+  try {
+    const shop = await getShopRoom(reservation.shopId, reservation.roomId);
+    const room = shop.rooms[0];
+    const roomReservation = await room.reservations.find(
+      (r) => `${r._id}` === `${reservation._id}`
+    );
+    roomReservation.confirmed = true;
+    await shop.save();
+    return roomReservation;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const confirmReservationById = async (reservationId) => {
   try {
     const reservation = await Reservation.findByIdAndUpdate(
@@ -107,6 +122,7 @@ export const confirmReservationById = async (reservationId) => {
     if (!reservation) {
       throw new Error("Reservation does not exist");
     }
+    await confirmRoomReservation(reservation);
     emitEvent(reservation.shopId, "confirmReservation", reservation);
     if (reservation.userId) {
       emitCustomerEvent(reservation.userId, "confirmReservation", reservation);
