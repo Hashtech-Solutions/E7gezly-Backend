@@ -57,7 +57,8 @@ export const initConnection = (server) => {
       }
     });
 
-    socket.on("unsubscribeUser", (userId) => {
+    socket.on("unsubscribeUser", () => {
+      const userId = socket.request.user._id;
       if (clientsByUserId[userId]) {
         clientsByUserId[userId].delete(socket.id);
       }
@@ -66,6 +67,13 @@ export const initConnection = (server) => {
     socket.on("disconnect", () => {
       console.log("user disconnected");
       Object.values(clientsByShopId).forEach((clients) => {
+        clients.delete(socket.id);
+      });
+    });
+
+    socket.on("disconnectUser", () => {
+      const userId = socket.request.user._id;
+      Object.values(clientsByUserId).forEach((clients) => {
         clients.delete(socket.id);
       });
     });

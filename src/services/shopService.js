@@ -2,6 +2,11 @@ import User from "../models/User.js";
 import Shop from "../models/Shop.js";
 import mongoose from "mongoose";
 import {emitEvent} from "../socket.js";
+import {
+  checkDatabaseForGameSearch,
+  checkAPIForGameSearch,
+  saveGameSearchToDatabase,
+} from "./shopUtils.js";
 
 const setNumVacancies = {
   $size: {
@@ -391,6 +396,30 @@ export const deleteShopById = async (id) => {
   try {
     const deletedShop = await Shop.findByIdAndDelete(id);
     return deletedShop;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const findGame = async (id, searchTerm) => {
+  try {
+    searchTerm = searchTerm.toLowerCase();
+    const databaseResult = await checkDatabaseForGameSearch(searchTerm);
+    if (databaseResult) {
+      return databaseResult;
+    }
+    const shop = await Shop.findById(id);
+    if (shop.gameSearches >= 200) {
+      throw new Error("Maximum number of searches reached");
+    }
+
+    const apiResult = await checkAPIForGameSearch(searchTerm);
+    const newGameSearch = {
+      searchTerm: searchTerm,
+      results: apiResult.results,
+    };
+    saveGameSearchToDatabase();
+    return apiResult;
   } catch (error) {
     throw new Error(error);
   }

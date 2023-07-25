@@ -342,6 +342,25 @@ const router = express.Router();
  *          application/json:
  *            schema:
  *              type: number
+ * /shop_moderator/{reservation_id}/confirm:
+ *   put:
+ *     summary: Confirm a reservation by ID
+ *     tags: [ShopModerator]
+ *     responses:
+ *       200:
+ *         description: OK
+ * /shop_moderator/game/find_game:
+ *   get:
+ *     summary: Find a game by name
+ *     tags: [ShopModerator]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
  */
 router.get("/shop_info", shopController.getShopInfo);
 
@@ -415,6 +434,8 @@ router.get(
   validateGetReceiptByDate,
   receiptController.getReceiptsByRoomId
 );
+
+router.get("game/find_game", shopController.findGame);
 
 router.get(
   "/receipt",
