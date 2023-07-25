@@ -430,8 +430,8 @@ export const findGame = async (id, searchTerm) => {
       searchTerm: searchTerm,
       results: apiResult.results,
     };
-    saveGameSearchToDatabase();
-    return apiResult;
+    await saveGameSearchToDatabase(newGameSearch, shop);
+    return apiResult.results;
   } catch (error) {
     throw new Error(error);
   }
