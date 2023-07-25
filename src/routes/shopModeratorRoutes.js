@@ -435,7 +435,7 @@ router.get(
   receiptController.getReceiptsByRoomId
 );
 
-router.get("game/find_game", shopController.findGame);
+router.get("/game/find_game", shopController.findGame);
 
 router.get(
   "/receipt",
