@@ -239,3 +239,14 @@ export const deleteReservationById = async (req, res, next) => {
     return next({status: 400, message: error}, req, res, next);
   }
 };
+
+export const findGame = async (req, res, next) => {
+  try {
+    const searchTerm = req.query.search;
+    const shopId = req.shopId;
+    const result = await shopService.findGame(shopId, searchTerm);
+    res.status(200).json(result);
+  } catch (error) {
+    return next({status: 400, message: error}, req, res, next);
+  }
+};
