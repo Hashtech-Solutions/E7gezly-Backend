@@ -135,6 +135,22 @@ const shopSchema = mongoose.Schema({
         type: Date,
         required: false,
       },
+      extras: [
+        {
+          name: {
+            type: String,
+            required: true,
+          },
+          quantity: {
+            type: Number,
+            required: true,
+          },
+          total: {
+            type: Number,
+            required: true,
+          },
+        },
+      ],
       userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

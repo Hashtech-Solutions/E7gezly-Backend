@@ -380,6 +380,13 @@ export default router;
  *           items:
  *             type: string
  *           description: List of available activities in the shop.
+ *     AddExtraToSession:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         quantity:
+ *           type: number
  *     ReceiptResponse:
  *        type: object
  *        properties:

@@ -272,6 +272,37 @@ export const updateShopById = async (id, update, options = {new: true}) => {
   }
 };
 
+export const addExtraToSession = async (id, roomId, extra) => {
+  try {
+    const shop = await Shop.findById(id);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+    const session = await getSessionByRoomId(shop, roomId);
+    if (!session) {
+      throw new Error("Session not found");
+    }
+    const shopExtra = shop.extras.find(
+      (shopExtra) => shopExtra.name === extra.name
+    );
+    if (!shopExtra) {
+      throw new Error("Extra not found in shop");
+    }
+    const extraTotal = shopExtra.price * extra.quantity;
+
+    session.extras = session.extras
+      ? [
+          ...session.extras,
+          {name: extra.name, quantity: extra.quantity, total: extraTotal},
+        ]
+      : [{name: extra.name, quantity: extra.quantity, total: extraTotal}];
+    await shop.save();
+    return session;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const addExtra = async (id, extra) => {
   try {
     const shop = await Shop.findById(id);
@@ -322,12 +353,13 @@ export const updateExtra = async (id, extra) => {
 
 const computeTimeTotal = (startTime, endTime, shop, roomId) => {
   const room = shop.rooms.find((room) => `${room._id}` === `${roomId}`);
-  const timeTotal = (endTime - startTime) / 1000 / 60 / 60;
-  return Math.ceil(
+  const timeInHours = (endTime - startTime) / 1000 / 60 / 60;
+  const timeTotal = Math.ceil(
     room.hourlyRate
-      ? timeTotal * room.hourlyRate
-      : timeTotal * shop.baseHourlyRate
+      ? timeInHours * room.hourlyRate
+      : timeInHours * shop.baseHourlyRate
   );
+  return timeTotal ? timeTotal : 0;
 };
 
 const computeExtraTotal = (extras, shopExtras) => {
@@ -340,7 +372,7 @@ const computeExtraTotal = (extras, shopExtras) => {
   return Math.ceil(extraTotal);
 };
 
-export const computeSessionTotal = async (id, roomId, extras) => {
+export const computeSessionTotal = async (id, roomId) => {
   try {
     const shop = await getShopById(id);
     if (!shop) {
@@ -353,7 +385,10 @@ export const computeSessionTotal = async (id, roomId, extras) => {
     const startTime = new Date(session.startTime);
     const endTime = new Date();
     const timeTotal = computeTimeTotal(startTime, endTime, shop, roomId);
-    const extrasTotal = extras ? computeExtraTotal(extras, shop.extras) : 0;
+    const extrasTotal = session.extras.reduce(
+      (agg, extra) => extra.total + agg,
+      0
+    );
     return {
       startTime,
       endTime,
@@ -371,6 +406,9 @@ export const addRoom = async (id, room) => {
     const shop = await Shop.findById(id);
     if (!shop) {
       throw new Error("Shop not found");
+    }
+    if (!room.hourlyRate && !shop.baseHourlyRate) {
+      throw new Error("Room or shop must have hourly rate");
     }
     shop.rooms.push(room);
     await shop.save();
