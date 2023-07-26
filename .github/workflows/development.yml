@@ -15,6 +15,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd server
+            cd E7gezly-Backend
             git pull origin development
             sudo docker compose up -d --build
