@@ -372,7 +372,7 @@ const computeExtraTotal = (extras, shopExtras) => {
   return Math.ceil(extraTotal);
 };
 
-export const computeSessionTotal = async (id, roomId, extras) => {
+export const computeSessionTotal = async (id, roomId) => {
   try {
     const shop = await getShopById(id);
     if (!shop) {
@@ -389,7 +389,6 @@ export const computeSessionTotal = async (id, roomId, extras) => {
       (agg, extra) => extra.total + agg,
       0
     );
-    // const extrasTotal = extras ? computeExtraTotal(extras, shop.extras) : 0;
     return {
       startTime,
       endTime,

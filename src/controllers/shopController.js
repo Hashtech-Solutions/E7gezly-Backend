@@ -231,12 +231,8 @@ export const confirmReservationById = async (req, res, next) => {
 export const computeSessionTotal = async (req, res, next) => {
   try {
     const shopId = req.shopId;
-    const {roomId, extras} = req.body;
-    const receipt = await shopService.computeSessionTotal(
-      shopId,
-      roomId,
-      extras
-    );
+    const roomId = req.params.room_id;
+    const receipt = await shopService.computeSessionTotal(shopId, roomId);
     res.status(200).json(receipt);
   } catch (error) {
     return next({status: 400, message: error}, req, res, next);
