@@ -17,6 +17,11 @@ export const addExtra = Joi.object({
   price: Joi.number().required(),
 });
 
+export const addExtraToSession = Joi.object({
+  name: Joi.string().required(),
+  quantity: Joi.number().required(),
+});
+
 export const updateExtra = Joi.object({
   name: Joi.string().required(),
   price: Joi.number().required(),

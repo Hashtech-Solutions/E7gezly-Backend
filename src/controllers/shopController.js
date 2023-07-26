@@ -49,6 +49,21 @@ export const addExtra = async (req, res, next) => {
   }
 };
 
+export const addExtraToSession = async (req, res, next) => {
+  try {
+    const shopId = req.shopId;
+    const roomId = req.params.room_id;
+    const {name, quantity} = req.body;
+    const session = await shopService.addExtraToSession(shopId, roomId, {
+      name,
+      quantity,
+    });
+    res.status(200).json(session);
+  } catch (error) {
+    return next({status: 400, message: error}, req, res, next);
+  }
+};
+
 export const removeExtra = async (req, res, next) => {
   try {
     const shopId = req.shopId;

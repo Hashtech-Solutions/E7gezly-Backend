@@ -361,6 +361,16 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: OK
+ * /shop_moderator/room/{room_id}/session/add_extra:
+ *   post:
+ *     summary: Add an extra to a session
+ *     tags: [ShopModerator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AddExtraToSession'
  */
 router.get("/shop_info", shopController.getShopInfo);
 
@@ -409,6 +419,12 @@ router.post(
   "/add_extra",
   validateBody(shopValidation.addExtra),
   shopController.addExtra
+);
+
+router.post(
+  "/room/:room_id/session/add_extra",
+  validateBody(shopValidation.addExtraToSession),
+  shopController.addExtraToSession
 );
 
 router.delete(
