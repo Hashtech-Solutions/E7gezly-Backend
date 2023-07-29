@@ -6,9 +6,13 @@ export const login = (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) return next(err);
     if (!user) return next({status: 400, message: info.message});
-    req.logIn(user, (err) => {
+    req.logIn(user, async (err) => {
       if (err) return next({status: 400, message: err});
-      return res.status(200).json(user);
+      let updatedUser = user;
+      updatedUser =
+        req.body.fcmToken &&
+        (await userService.addFCMToken(user._id, req.body.fcmToken));
+      return res.status(200).json(updatedUser);
     });
   })(req, res, next);
 };
@@ -20,6 +24,7 @@ export const signup = async (req, res, next) => {
       ...req.body,
       role: "customer",
       password,
+      fcmTokens: req.body.fcmToken ? [req.body.fcmToken] : [],
     });
     req.logIn(user, (err) => {
       if (err) return next({status: 400, message: err});

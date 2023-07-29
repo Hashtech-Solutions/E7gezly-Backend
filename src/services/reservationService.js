@@ -1,6 +1,7 @@
 import {Reservation} from "../models/Reservation.js";
 import Shop from "../models/Shop.js";
-import {emitEvent, emitCustomerEvent} from "../socket.js";
+import * as userService from "./userService.js";
+import {emitEvent} from "../socket.js";
 
 const validateOverlappingReservations = async (reservation) => {
   try {
@@ -89,7 +90,11 @@ export const deleteReservationById = async (reservationId) => {
     await removeReservationFromRoom(reservationId, shop);
     emitEvent(reservation.shopId, "deleteReservation", reservationId);
     if (reservation.userId) {
-      emitCustomerEvent(reservation.userId, "deleteReservation", reservationId);
+      userService.sendNotification(reservation.userId, {
+        deleted: "true",
+        shopId: reservation.shopId,
+        startTime: reservation.startTime,
+      });
     }
     return reservation;
   } catch (error) {
@@ -125,7 +130,11 @@ export const confirmReservationById = async (reservationId) => {
     await confirmRoomReservation(reservation);
     emitEvent(reservation.shopId, "confirmReservation", reservation);
     if (reservation.userId) {
-      emitCustomerEvent(reservation.userId, "confirmReservation", reservation);
+      userService.sendNotification(reservation.userId, {
+        confirmed: "true",
+        shopId: reservation.shopId,
+        startTime: reservation.startTime,
+      });
     }
     return reservation;
   } catch (error) {

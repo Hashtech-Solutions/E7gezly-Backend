@@ -446,6 +446,9 @@ export default router;
  *           type: string
  *         password:
  *           type: string
+ *         fcmToken:
+ *           type: string
+ *           required: false
  *     Login:
  *       type: object
  *       properties:
@@ -453,6 +456,9 @@ export default router;
  *           type: string
  *         password:
  *           type: string
+ *         fcmToken:
+ *           type: string
+ *           required: false
  */
 
 /**
