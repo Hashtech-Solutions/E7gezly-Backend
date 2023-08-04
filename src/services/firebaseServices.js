@@ -1,4 +1,4 @@
-import {firebaseApp} from "../index.js";
+import firebaseApp from "../firebase.js";
 import {getMessaging} from "firebase-admin/messaging";
 
 /**

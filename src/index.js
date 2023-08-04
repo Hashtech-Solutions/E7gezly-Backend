@@ -12,7 +12,6 @@ import swaggerJsdoc from "swagger-jsdoc";
 import {initConnection} from "./socket.js";
 import cron from "node-cron";
 import {Reservation} from "./models/Reservation.js";
-import {initializeApp, applicationDefault} from "firebase-admin/app";
 
 dotenv.config();
 
@@ -82,7 +81,4 @@ initConnection(server);
 
 server.listen(3000, () => console.log("Server running on port 3000"));
 
-export const firebaseApp = initializeApp({
-  credential: applicationDefault(),
-});
 export default app;
