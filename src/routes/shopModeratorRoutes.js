@@ -195,24 +195,13 @@ const router = express.Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/RoomResponse'
- * /shop_moderator/compute_total:
- *   post:
+ * /shop_moderator/room/{{room_id}}/session/compute_total:
+ *   get:
  *     summary: Compute the total price of a reservation
  *     tags: [ShopModerator]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/ComputeTotal'
  *     responses:
  *       200:
  *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ComputeTotalResponse'
- *
  * /shop_moderator/receipt:
  *   get:
  *     summary: Get all receipts for a shop or receipts in a date range if start_date and end_date are provided or invalid date format
@@ -361,6 +350,16 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: OK
+ * /shop_moderator/room/{room_id}/session/add_extra:
+ *   post:
+ *     summary: Add an extra to a session
+ *     tags: [ShopModerator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AddExtraToSession'
  */
 router.get("/shop_info", shopController.getShopInfo);
 
@@ -411,6 +410,12 @@ router.post(
   shopController.addExtra
 );
 
+router.post(
+  "/room/:room_id/session/add_extra",
+  validateBody(shopValidation.addExtraToSession),
+  shopController.addExtraToSession
+);
+
 router.delete(
   "/remove_extra",
   validateBody(shopValidation.removeExtra),
@@ -423,9 +428,8 @@ router.put(
   shopController.updateExtra
 );
 
-router.post(
-  "/compute_total",
-  validateBody(shopValidation.computeTotal),
+router.get(
+  "/room/:room_id/session/compute_total",
   shopController.computeSessionTotal
 );
 

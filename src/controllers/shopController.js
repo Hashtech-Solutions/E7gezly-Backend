@@ -49,6 +49,21 @@ export const addExtra = async (req, res, next) => {
   }
 };
 
+export const addExtraToSession = async (req, res, next) => {
+  try {
+    const shopId = req.shopId;
+    const roomId = req.params.room_id;
+    const {name, quantity} = req.body;
+    const session = await shopService.addExtraToSession(shopId, roomId, {
+      name,
+      quantity,
+    });
+    res.status(200).json(session);
+  } catch (error) {
+    return next({status: 400, message: error}, req, res, next);
+  }
+};
+
 export const removeExtra = async (req, res, next) => {
   try {
     const shopId = req.shopId;
@@ -150,10 +165,15 @@ export const toggleStatus = async (req, res, next) => {
 
 export const checkInRoom = async (req, res, next) => {
   try {
-    const {roomId, userId} = req.body;
+    const session = req.body;
     const {shopId} = req;
-    const session = await shopService.checkInRoom(shopId, roomId, userId);
-    res.status(200).json(session);
+    const reservation_id = req.query.reservation_id;
+    const response = await shopService.checkInRoom(
+      shopId,
+      session,
+      reservation_id
+    );
+    res.status(200).json(response);
   } catch (error) {
     return next({status: 400, message: error}, req, res, next);
   }
@@ -216,12 +236,8 @@ export const confirmReservationById = async (req, res, next) => {
 export const computeSessionTotal = async (req, res, next) => {
   try {
     const shopId = req.shopId;
-    const {roomId, extras} = req.body;
-    const receipt = await shopService.computeSessionTotal(
-      shopId,
-      roomId,
-      extras
-    );
+    const roomId = req.params.room_id;
+    const receipt = await shopService.computeSessionTotal(shopId, roomId);
     res.status(200).json(receipt);
   } catch (error) {
     return next({status: 400, message: error}, req, res, next);

@@ -20,6 +20,13 @@ const userSchema = mongoose.Schema({
     required: true,
     enum: ["admin", "shopAdmin", "shopModerator", "customer"],
   },
+  fcmTokens: [
+    {
+      type: String,
+      required: false,
+      default: [],
+    },
+  ],
 });
 
 const User = mongoose.model("User", userSchema);

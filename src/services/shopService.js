@@ -1,7 +1,13 @@
 import User from "../models/User.js";
 import Shop from "../models/Shop.js";
 import mongoose from "mongoose";
-import {emitEvent} from "../socket.js";
+// import {emitEvent} from "../socket.js";
+
+import {
+  getRoomUpcomingReservation,
+  deleteReservationById,
+} from "./reservationService.js";
+
 import {
   checkDatabaseForGameSearch,
   checkAPIForGameSearch,
@@ -31,36 +37,6 @@ const setRoomStatus = (roomId, status) => ({
           $mergeObjects: [
             "$$room",
             {
-              status: status,
-            },
-          ],
-        },
-        else: "$$room",
-      },
-    },
-  },
-});
-
-const setRoomCheckout = (roomId, status) => ({
-  $map: {
-    input: "$rooms",
-    as: "room",
-    in: {
-      $cond: {
-        if: {$eq: ["$$room._id", roomId]},
-        then: {
-          $mergeObjects: [
-            "$$room",
-            {
-              reservations: {
-                $filter: {
-                  input: "$$room.reservations",
-                  as: "reservation",
-                  cond: {
-                    $gt: ["$$reservation.startTime", new Date()],
-                  },
-                },
-              },
               status: status,
             },
           ],
@@ -178,8 +154,13 @@ export const getSessionByRoomId = (shop, roomId) => {
   return session;
 };
 
-export const checkInRoom = async (shopId, roomId, userId) => {
+export const checkInRoom = async (
+  shopId,
+  sessionBody,
+  reservation_id = null
+) => {
   try {
+    const {roomId, userId, endTime} = sessionBody;
     const shop = await Shop.findById(shopId);
     if (!shop) {
       throw new Error("Shop not found");
@@ -187,6 +168,10 @@ export const checkInRoom = async (shopId, roomId, userId) => {
     const existingSession = getSessionByRoomId(shop, roomId);
     if (existingSession) {
       throw new Error("Room is already occupied");
+    }
+    let reservation;
+    if (reservation_id) {
+      reservation = await deleteReservationById(reservation_id);
     }
     const updatedShop = await updateShopById(shopId, [
       {
@@ -198,6 +183,7 @@ export const checkInRoom = async (shopId, roomId, userId) => {
               roomName: shop.rooms.find((room) => `${room._id}` === `${roomId}`)
                 .name,
               startTime: new Date().toISOString(),
+              endTime: endTime ? endTime : reservation?.endTime,
               userId,
             },
           ],
@@ -220,7 +206,6 @@ export const checkInRoom = async (shopId, roomId, userId) => {
       session,
       numVacancies: updatedShop.numVacancies,
     };
-    emitEvent(shopId, "checkIn", returnValue);
     return returnValue;
   } catch (error) {
     throw new Error(error);
@@ -242,7 +227,7 @@ export const checkOutRoom = async (shopId, roomId) => {
                 cond: {$ne: ["$$session.roomId", roomId]},
               },
             },
-            rooms: setRoomCheckout(roomId, "available"), // filter out reservations with startTime < now and set room status to available
+            rooms: setRoomStatus(roomId, "available"),
           },
         },
         {
@@ -256,7 +241,6 @@ export const checkOutRoom = async (shopId, roomId) => {
       numVacancies: updatedShop.numVacancies,
       roomId,
     };
-    emitEvent(shopId, "checkOut", returnValue);
     return returnValue;
   } catch (error) {
     throw new Error(error);
@@ -267,6 +251,37 @@ export const updateShopById = async (id, update, options = {new: true}) => {
   try {
     const updatedShop = await Shop.findOneAndUpdate({_id: id}, update, options);
     return updatedShop;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const addExtraToSession = async (id, roomId, extra) => {
+  try {
+    const shop = await Shop.findById(id);
+    if (!shop) {
+      throw new Error("Shop not found");
+    }
+    const session = await getSessionByRoomId(shop, roomId);
+    if (!session) {
+      throw new Error("Session not found");
+    }
+    const shopExtra = shop.extras.find(
+      (shopExtra) => shopExtra.name === extra.name
+    );
+    if (!shopExtra) {
+      throw new Error("Extra not found in shop");
+    }
+    const extraTotal = shopExtra.price * extra.quantity;
+
+    session.extras = session.extras
+      ? [
+          ...session.extras,
+          {name: extra.name, quantity: extra.quantity, total: extraTotal},
+        ]
+      : [{name: extra.name, quantity: extra.quantity, total: extraTotal}];
+    await shop.save();
+    return session;
   } catch (error) {
     throw new Error(error);
   }
@@ -322,12 +337,13 @@ export const updateExtra = async (id, extra) => {
 
 const computeTimeTotal = (startTime, endTime, shop, roomId) => {
   const room = shop.rooms.find((room) => `${room._id}` === `${roomId}`);
-  const timeTotal = (endTime - startTime) / 1000 / 60 / 60;
-  return Math.ceil(
+  const timeInHours = (endTime - startTime) / 1000 / 60 / 60;
+  const timeTotal = Math.ceil(
     room.hourlyRate
-      ? timeTotal * room.hourlyRate
-      : timeTotal * shop.baseHourlyRate
+      ? timeInHours * room.hourlyRate
+      : timeInHours * shop.baseHourlyRate
   );
+  return timeTotal ? timeTotal : 0;
 };
 
 const computeExtraTotal = (extras, shopExtras) => {
@@ -340,7 +356,7 @@ const computeExtraTotal = (extras, shopExtras) => {
   return Math.ceil(extraTotal);
 };
 
-export const computeSessionTotal = async (id, roomId, extras) => {
+export const computeSessionTotal = async (id, roomId) => {
   try {
     const shop = await getShopById(id);
     if (!shop) {
@@ -353,7 +369,10 @@ export const computeSessionTotal = async (id, roomId, extras) => {
     const startTime = new Date(session.startTime);
     const endTime = new Date();
     const timeTotal = computeTimeTotal(startTime, endTime, shop, roomId);
-    const extrasTotal = extras ? computeExtraTotal(extras, shop.extras) : 0;
+    const extrasTotal = session.extras.reduce(
+      (agg, extra) => extra.total + agg,
+      0
+    );
     return {
       startTime,
       endTime,
@@ -371,6 +390,9 @@ export const addRoom = async (id, room) => {
     const shop = await Shop.findById(id);
     if (!shop) {
       throw new Error("Shop not found");
+    }
+    if (!room.hourlyRate && !shop.baseHourlyRate) {
+      throw new Error("Room or shop must have hourly rate");
     }
     shop.rooms.push(room);
     await shop.save();

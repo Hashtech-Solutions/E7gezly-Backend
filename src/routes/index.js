@@ -380,6 +380,13 @@ export default router;
  *           items:
  *             type: string
  *           description: List of available activities in the shop.
+ *     AddExtraToSession:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         quantity:
+ *           type: number
  *     ReceiptResponse:
  *        type: object
  *        properties:
@@ -439,6 +446,9 @@ export default router;
  *           type: string
  *         password:
  *           type: string
+ *         fcmToken:
+ *           type: string
+ *           required: false
  *     Login:
  *       type: object
  *       properties:
@@ -446,6 +456,9 @@ export default router;
  *           type: string
  *         password:
  *           type: string
+ *         fcmToken:
+ *           type: string
+ *           required: false
  */
 
 /**

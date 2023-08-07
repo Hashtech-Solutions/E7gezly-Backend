@@ -1,6 +1,7 @@
 import {Reservation} from "../models/Reservation.js";
 import Shop from "../models/Shop.js";
-import {emitEvent, emitCustomerEvent} from "../socket.js";
+import * as userService from "./userService.js";
+import {emitEvent} from "../socket.js";
 
 const validateOverlappingReservations = async (reservation) => {
   try {
@@ -14,6 +15,21 @@ const validateOverlappingReservations = async (reservation) => {
     }
   } catch (error) {
     throw new Error(error.message);
+  }
+};
+
+export const getRoomUpcomingReservation = async (shopId, roomId) => {
+  try {
+    const reservation = await Reservation.find({
+      shopId: shopId,
+      roomId: roomId,
+      // reservations with startTime within 25 minutes from now
+      startTime: {$lt: new Date(new Date().getTime() + 25 * 60 * 1000)},
+      endTime: {$gt: new Date()},
+    });
+    return reservation;
+  } catch (error) {
+    throw new Error(error);
   }
 };
 
@@ -35,34 +51,10 @@ const getShopRoom = async (shopId, roomId) => {
   }
 };
 
-const addReservationToRoom = async (reservation, shop) => {
-  try {
-    const room = shop.rooms[0];
-    room.reservations.push(reservation);
-    await shop.save();
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const removeReservationFromRoom = async (reservationId, shop) => {
-  try {
-    const room = shop.rooms[0];
-    room.reservations = room.reservations.filter(
-      (reservation) => `${reservation._id}` !== `${reservationId}`
-    );
-    await shop.save();
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 export const createReservation = async (reservation) => {
   try {
     await validateOverlappingReservations(reservation);
-    const shop = await getShopRoom(reservation.shopId, reservation.roomId);
     const newReservation = await Reservation.create(reservation);
-    await addReservationToRoom(newReservation, shop);
     emitEvent(reservation.shopId, "addReservation", newReservation);
     return newReservation;
   } catch (error) {
@@ -85,11 +77,13 @@ export const deleteReservationById = async (reservationId) => {
     if (!reservation) {
       throw new Error("Reservation does not exist");
     }
-    const shop = await getShopRoom(reservation.shopId, reservation.roomId);
-    await removeReservationFromRoom(reservationId, shop);
     emitEvent(reservation.shopId, "deleteReservation", reservationId);
     if (reservation.userId) {
-      emitCustomerEvent(reservation.userId, "deleteReservation", reservationId);
+      userService.sendNotification(reservation.userId, {
+        deleted: "true",
+        shopId: reservation.shopId,
+        startTime: reservation.startTime,
+      });
     }
     return reservation;
   } catch (error) {
@@ -125,7 +119,11 @@ export const confirmReservationById = async (reservationId) => {
     await confirmRoomReservation(reservation);
     emitEvent(reservation.shopId, "confirmReservation", reservation);
     if (reservation.userId) {
-      emitCustomerEvent(reservation.userId, "confirmReservation", reservation);
+      userService.sendNotification(reservation.userId, {
+        confirmed: "true",
+        shopId: reservation.shopId,
+        startTime: reservation.startTime,
+      });
     }
     return reservation;
   } catch (error) {
