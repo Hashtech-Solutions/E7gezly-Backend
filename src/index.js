@@ -1,12 +1,10 @@
 import express from "express";
 import {createServer} from "http";
-import sessionMiddleware from "./config/sessionMiddleware.js";
 import connectDB from "./config/database.js";
 import dotenv from "dotenv";
 import cors from "cors";
 import errorHandler from "./middleware/errorHandler.js";
 import router from "./routes/index.js";
-import passport from "passport";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import {initConnection} from "./socket.js";
@@ -28,11 +26,7 @@ app.use(cors(corsOptions));
 
 app.options("*", cors(corsOptions));
 
-app.use(sessionMiddleware);
-
 connectDB();
-app.use(passport.initialize());
-app.use(passport.session());
 
 const options = {
   definition: {

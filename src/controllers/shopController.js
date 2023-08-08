@@ -88,11 +88,10 @@ export const updateExtra = async (req, res, next) => {
 
 export const createShopModerator = async (req, res, next) => {
   try {
-    let {password} = req.body;
-    password = await bcrypt.hash(password, 10);
+    const {email, firebaseUID} = req.body;
     const shopModerator = await shopService.createShopModerator({
-      ...req.body,
-      password,
+      email,
+      firebaseUID,
       role: "shopModerator",
       shopId: req.shopId,
     });

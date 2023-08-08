@@ -28,9 +28,9 @@ export const getUserById = async (id) => {
   }
 };
 
-export const getUserByUserName = async (userName) => {
+export const getUserByEmail = async (email) => {
   try {
-    const user = await User.findOne({ userName });
+    const user = await User.findOne({email: email});
     return user;
   } catch (error) {
     throw new Error(error);
@@ -39,7 +39,7 @@ export const getUserByUserName = async (userName) => {
 
 export const updateUser = async (id, user) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(id, user, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(id, user, {new: true});
     return updatedUser;
   } catch (error) {
     throw new Error(error);
@@ -55,6 +55,20 @@ export const deleteUser = async (id) => {
   }
 };
 
+/**
+ * Finds a user by their Firebase UID.
+ * @param {string} firebaseUID - The Firebase UID of the user to find.
+ * @returns {Promise<User>} - A promise that resolves with the user object.
+ * @throws {Error} - If there was an error finding the user.
+ */
+export const getUserByFirebaseUID = async (firebaseUID) => {
+  try {
+    const user = await User.findOne({firebaseUID: firebaseUID});
+    return user;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 /**
  * Adds a new FCM token to the user's list of tokens, if it doesn't already exist.
  * @param {string} id - The ID of the user to add the token to.

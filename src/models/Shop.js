@@ -97,7 +97,7 @@ const shopSchema = mongoose.Schema({
         required: true,
         ref: "User",
       },
-      userName: {
+      email: {
         type: String,
         required: true,
       },

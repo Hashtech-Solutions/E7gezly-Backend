@@ -1,7 +1,6 @@
 import {Server} from "socket.io";
-import passport from "passport";
-import sessionMiddleware from "./config/sessionMiddleware.js";
-
+import {verifyToken} from "./services/firebaseServices.js";
+import User from "./models/User.js";
 let ioInstance = null;
 const clientsByShopId = {};
 const clientsByUserId = {};
@@ -14,13 +13,19 @@ export const getIo = (server) => {
         credentials: true,
       },
     });
-    io.engine.use(sessionMiddleware);
-    io.engine.use(passport.initialize());
-    io.engine.use(passport.session());
-
-    io.use((socket, next) => {
-      if (socket.request.isAuthenticated()) {
-        return next();
+    io.use(async (socket, next) => {
+      if (socket.handshake.auth && socket.handshake.auth.token) {
+        try {
+          const decodedToken = await verifyToken(socket.handshake.auth.token);
+          const user = await User.findOne({firebaseUID: decodedToken.uid});
+          if (!user) {
+            throw new Error("Unauthorized");
+          }
+          socket.request.user = user;
+          next();
+        } catch (error) {
+          io.emit("unauthorized");
+        }
       } else {
         io.emit("unauthorized");
       }

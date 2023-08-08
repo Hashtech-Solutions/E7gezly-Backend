@@ -84,7 +84,7 @@ export const createShopModerator = async (shopModerator) => {
         $push: {
           shopModerators: {
             _id: createdShopModerator._id,
-            userName: createdShopModerator.userName,
+            email: createdShopModerator.email,
           },
         },
       },

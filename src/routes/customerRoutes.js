@@ -78,22 +78,22 @@ const router = express.Router();
  *         schema:
  *           type: string
  *           items:
- *             userName: string
+ *             email: string
  *   put:
  *     summary: Update customer profile
  *     tags: [Customer]
  *     requestBody:
  *       required: true
- *       description: Update customer profile, should send userName or [oldPassword, newPassword] or all of them
+ *       description: Update customer profile, should send email
  *       content:
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/UpdateProfileRequest'
  *     responses:
  *       200:
- *        description: Successful operation if update userName or password or both
+ *        description: Successful operation if update email
  *       400:
- *        description: Bad request if not send either userName or [oldPassword, newPassword] or userName exists or oldPassword is wrong
+ *        description: Bad request if not send email or email exists
  *
  *
  *
@@ -119,4 +119,6 @@ router.put(
   validateBody(customerValidation.updateProfile),
   customerController.updateCustomerProfile
 );
+
+router.put("/fcmToken", customerController.addFCMToken);
 export default router;

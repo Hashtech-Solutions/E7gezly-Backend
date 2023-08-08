@@ -1,7 +1,7 @@
 import * as shopService from "../services/shopService.js";
 import * as reservationService from "../services/reservationService.js";
 import * as userService from "../services/userService.js";
-import bcrypt from "bcrypt";
+import * as firebaseService from "../services/firebaseServices.js";
 export const getManyShops = async (req, res, next) => {
   try {
     const query = req.query;
@@ -67,46 +67,65 @@ export const getCustomerProfile = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const user = await userService.getUserById(userId);
-    res.status(200).json({ userName: user.userName });
+    res.status(200).json({email: user.email});
   } catch (error) {
-    res.status(400).json({ message: error });
-    return next({ status: 400, message: error }, req, res, next);
+    res.status(400).json({message: error});
+    return next({status: 400, message: error}, req, res, next);
   }
 };
 
+/**
+ * Update customer profile information
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Object} - JSON response indicating success or error
+ */
 export const updateCustomerProfile = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const user = await userService.getUserById(userId);
-    const { userName, oldPassword } = req.body;
-    let { newPassword } = req.body;
-    if (userName) {
-      const user = await userService.getUserByUserName(userName);
+    var user = await userService.getUserById(userId);
+    const email = req.body;
+    await firebaseService.changeUserEmail(user.firebaseUID, email);
+    var oldEmail = user.email;
+    if (email) {
+      const user = await userService.getUserByEmail(email);
       if (user) {
         return next(
-          { status: 400, message: "Username already exists" },
+          {status: 400, message: "email already exists"},
           req,
           res,
           next
         );
       }
     }
-    if (oldPassword) {
-      if (!(await bcrypt.compare(oldPassword, user.password))) {
-        return next(
-          { status: 400, message: "Incorrect old password" },
-          req,
-          res,
-          next
-        );
-      }
-      newPassword = await bcrypt.hash(newPassword, 10);
-    }
-    user.userName = userName || user.userName;
-    user.password = newPassword || user.password;
+    user.email = email || user.email;
     await userService.updateUser(userId, user);
     res.status(200).json(user);
   } catch (error) {
-    return next({ status: 400, message: error }, req, res, next);
+    if (!/auth\/.*/.test(error.code)) {
+      // check if error is related to firebase
+      await firebaseService.changeUserEmail(user.firebaseUID, oldEmail); // revert email change if error is not related to firebase to avoid inconsistency
+    }
+    return next({status: 400, message: error}, req, res, next);
+  }
+};
+
+/**
+ * Add FCM token to user's account
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Object} - JSON response indicating success or error
+ */
+export const addFCMToken = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const {fcmToken} = req.body;
+    if (!fcmToken) return next({status: 400, message: "Token not found"});
+    await userService.addFCMToken(userId, fcmToken);
+    res.status(200).json({message: "Token added successfully"});
+  } catch (error) {
+    return next({status: 400, message: error}, req, res, next);
   }
 };

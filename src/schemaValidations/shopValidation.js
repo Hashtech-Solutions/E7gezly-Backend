@@ -3,13 +3,13 @@ import * as enums from "../models/enums.js";
 
 export const shopSchema = Joi.object({
   name: Joi.string().required(),
-  userName: Joi.string().required(),
+  email: Joi.string().required(),
+  firebaseUID: Joi.string().required(),
   location: Joi.object({
     long: Joi.number().required(),
     lat: Joi.number().required(),
   }),
   image: Joi.string(),
-  password: Joi.string().min(8).required(),
 });
 
 export const addExtra = Joi.object({
@@ -32,8 +32,8 @@ export const removeExtra = Joi.object({
 });
 
 export const shopModeratorSchema = Joi.object({
-  userName: Joi.string().required(),
-  password: Joi.string().min(8).required(),
+  email: Joi.string().required(),
+  firebaseUID: Joi.string().required(),
 });
 
 export const updateShopInfo = Joi.object({
