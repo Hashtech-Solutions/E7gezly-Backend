@@ -95,7 +95,22 @@ const router = express.Router();
  *       400:
  *        description: Bad request if not send email or email exists
  *
- *
+ * customer/fcmToken:
+ *   put:
+ *     summary: Add FCM token to the user
+ *     tags: [Customer]
+ *     requestBody:
+ *       required: true
+ *       description: Add FCM token to the user
+ *       schema:
+ *         type: string
+ *         items:
+ *           fcmToken: string
+ *     responses:
+ *       200:
+ *        description: Successful operation if fcm token added
+ *       400:
+ *        description: Bad request if not send fcm token
  *
  *
  */
