@@ -96,6 +96,23 @@ export default router;
  *           items:
  *             type: string
  *           description: List of available services in the room.
+ *     TableResponse:
+ *       type: array
+ *       items:
+ *         type: object
+ *         properties:
+ *           roomId:
+ *             type: string
+ *           roomName:
+ *             type: string
+ *           roomStatus:
+ *             type: string
+ *           reservations:
+ *             type: array 
+ *             items:
+ *               $ref: '#/components/schemas/ReservationResponse' 
+ *           session:
+ *             type: object   
  *     ShopModerator:
  *       type: object
  *       properties:

@@ -4,8 +4,8 @@ import mongoose from "mongoose";
 // import {emitEvent} from "../socket.js";
 
 import {
-  getRoomUpcomingReservation,
   deleteReservationById,
+  getManyReservations
 } from "./reservationService.js";
 
 import {
@@ -146,6 +146,31 @@ export const getShopById = async (id) => {
     throw new Error(error);
   }
 };
+
+export const getShopTable = async (id) => {
+  try {
+    const shop = await Shop.findById(id);
+    const reservations = await getManyReservations({shopId: id});
+    const table = shop.rooms?.map((room) => {
+      const roomReservations = reservations.filter(
+        (reservation) => `${reservation.roomId}` === `${room._id}`
+      );
+      const session = shop.sessions.find(
+        (session) => `${session.roomId}` === `${room._id}`
+      );
+      return {
+        roomId: room._id,
+        roomName: room.name,
+        roomStatus: room.status,
+        reservations: roomReservations,
+        session: session,
+      }
+    });
+    return table;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
 
 export const getSessionByRoomId = (shop, roomId) => {
   const session = shop.sessions.find(
