@@ -1,7 +1,13 @@
 import User from "../models/User.js";
 import Shop from "../models/Shop.js";
 import mongoose from "mongoose";
-import {emitEvent} from "../socket.js";
+// import {emitEvent} from "../socket.js";
+
+import {
+  getRoomUpcomingReservation,
+  deleteReservationById,
+} from "./reservationService.js";
+
 import {
   checkDatabaseForGameSearch,
   checkAPIForGameSearch,
@@ -31,36 +37,6 @@ const setRoomStatus = (roomId, status) => ({
           $mergeObjects: [
             "$$room",
             {
-              status: status,
-            },
-          ],
-        },
-        else: "$$room",
-      },
-    },
-  },
-});
-
-const setRoomCheckout = (roomId, status) => ({
-  $map: {
-    input: "$rooms",
-    as: "room",
-    in: {
-      $cond: {
-        if: {$eq: ["$$room._id", roomId]},
-        then: {
-          $mergeObjects: [
-            "$$room",
-            {
-              reservations: {
-                $filter: {
-                  input: "$$room.reservations",
-                  as: "reservation",
-                  cond: {
-                    $gt: ["$$reservation.startTime", new Date()],
-                  },
-                },
-              },
               status: status,
             },
           ],
@@ -108,7 +84,7 @@ export const createShopModerator = async (shopModerator) => {
         $push: {
           shopModerators: {
             _id: createdShopModerator._id,
-            userName: createdShopModerator.userName,
+            email: createdShopModerator.email,
           },
         },
       },
@@ -178,8 +154,13 @@ export const getSessionByRoomId = (shop, roomId) => {
   return session;
 };
 
-export const checkInRoom = async (shopId, roomId, userId) => {
+export const checkInRoom = async (
+  shopId,
+  sessionBody,
+  reservation_id = null
+) => {
   try {
+    const {roomId, userId, endTime} = sessionBody;
     const shop = await Shop.findById(shopId);
     if (!shop) {
       throw new Error("Shop not found");
@@ -187,6 +168,10 @@ export const checkInRoom = async (shopId, roomId, userId) => {
     const existingSession = getSessionByRoomId(shop, roomId);
     if (existingSession) {
       throw new Error("Room is already occupied");
+    }
+    let reservation;
+    if (reservation_id) {
+      reservation = await deleteReservationById(reservation_id);
     }
     const updatedShop = await updateShopById(shopId, [
       {
@@ -198,6 +183,7 @@ export const checkInRoom = async (shopId, roomId, userId) => {
               roomName: shop.rooms.find((room) => `${room._id}` === `${roomId}`)
                 .name,
               startTime: new Date().toISOString(),
+              endTime: endTime ? endTime : reservation?.endTime,
               userId,
             },
           ],
@@ -220,7 +206,6 @@ export const checkInRoom = async (shopId, roomId, userId) => {
       session,
       numVacancies: updatedShop.numVacancies,
     };
-    emitEvent(shopId, "checkIn", returnValue);
     return returnValue;
   } catch (error) {
     throw new Error(error);
@@ -242,7 +227,7 @@ export const checkOutRoom = async (shopId, roomId) => {
                 cond: {$ne: ["$$session.roomId", roomId]},
               },
             },
-            rooms: setRoomCheckout(roomId, "available"), // filter out reservations with startTime < now and set room status to available
+            rooms: setRoomStatus(roomId, "available"),
           },
         },
         {
@@ -256,7 +241,6 @@ export const checkOutRoom = async (shopId, roomId) => {
       numVacancies: updatedShop.numVacancies,
       roomId,
     };
-    emitEvent(shopId, "checkOut", returnValue);
     return returnValue;
   } catch (error) {
     throw new Error(error);

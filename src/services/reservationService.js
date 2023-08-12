@@ -18,6 +18,21 @@ const validateOverlappingReservations = async (reservation) => {
   }
 };
 
+export const getRoomUpcomingReservation = async (shopId, roomId) => {
+  try {
+    const reservation = await Reservation.find({
+      shopId: shopId,
+      roomId: roomId,
+      // reservations with startTime within 25 minutes from now
+      startTime: {$lt: new Date(new Date().getTime() + 25 * 60 * 1000)},
+      endTime: {$gt: new Date()},
+    });
+    return reservation;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const getShopRoom = async (shopId, roomId) => {
   try {
     const shop = await Shop.findOne(
@@ -36,34 +51,10 @@ const getShopRoom = async (shopId, roomId) => {
   }
 };
 
-const addReservationToRoom = async (reservation, shop) => {
-  try {
-    const room = shop.rooms[0];
-    room.reservations.push(reservation);
-    await shop.save();
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const removeReservationFromRoom = async (reservationId, shop) => {
-  try {
-    const room = shop.rooms[0];
-    room.reservations = room.reservations.filter(
-      (reservation) => `${reservation._id}` !== `${reservationId}`
-    );
-    await shop.save();
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 export const createReservation = async (reservation) => {
   try {
     await validateOverlappingReservations(reservation);
-    const shop = await getShopRoom(reservation.shopId, reservation.roomId);
     const newReservation = await Reservation.create(reservation);
-    await addReservationToRoom(newReservation, shop);
     emitEvent(reservation.shopId, "addReservation", newReservation);
     return newReservation;
   } catch (error) {
@@ -86,8 +77,6 @@ export const deleteReservationById = async (reservationId) => {
     if (!reservation) {
       throw new Error("Reservation does not exist");
     }
-    const shop = await getShopRoom(reservation.shopId, reservation.roomId);
-    await removeReservationFromRoom(reservationId, shop);
     emitEvent(reservation.shopId, "deleteReservation", reservationId);
     if (reservation.userId) {
       userService.sendNotification(reservation.userId, {

@@ -88,11 +88,10 @@ export const updateExtra = async (req, res, next) => {
 
 export const createShopModerator = async (req, res, next) => {
   try {
-    let {password} = req.body;
-    password = await bcrypt.hash(password, 10);
+    const {email, firebaseUID} = req.body;
     const shopModerator = await shopService.createShopModerator({
-      ...req.body,
-      password,
+      email,
+      firebaseUID,
       role: "shopModerator",
       shopId: req.shopId,
     });
@@ -165,10 +164,15 @@ export const toggleStatus = async (req, res, next) => {
 
 export const checkInRoom = async (req, res, next) => {
   try {
-    const {roomId, userId} = req.body;
+    const session = req.body;
     const {shopId} = req;
-    const session = await shopService.checkInRoom(shopId, roomId, userId);
-    res.status(200).json(session);
+    const reservation_id = req.query.reservation_id;
+    const response = await shopService.checkInRoom(
+      shopId,
+      session,
+      reservation_id
+    );
+    res.status(200).json(response);
   } catch (error) {
     return next({status: 400, message: error}, req, res, next);
   }

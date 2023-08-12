@@ -3,7 +3,7 @@ import auth from "./authRoutes.js";
 import shop from "./adminRoutes.js";
 import shopAdmin from "./shopAdminRoutes.js";
 import shopModerator from "./shopModeratorRoutes.js";
-import passport from "passport";
+import authMiddleware from "../middleware/authMiddleware.js";
 import fetchShopId from "../middleware/fetchShop.js";
 import customer from "./customerRoutes.js";
 
@@ -15,20 +15,20 @@ router.get("/", (req, res) => {
 
 router.use("/auth", auth);
 
-router.use("/admin/shop", passport.authorize("admin"), shop);
+router.use("/admin/shop", authMiddleware("admin"), shop);
 router.use(
   "/shop_admin",
   fetchShopId,
-  passport.authorize("shopModerator"),
+  authMiddleware("shopModerator"),
   shopAdmin
 );
 router.use(
   "/shop_moderator",
   fetchShopId,
-  passport.authorize("shopModerator"),
+  authMiddleware("shopModerator"),
   shopModerator
 );
-router.use("/customer", passport.authorize("customer"), customer);
+router.use("/customer", authMiddleware("customer"), customer);
 
 export default router;
 
@@ -41,7 +41,9 @@ export default router;
  *       properties:
  *         name:
  *           type: string
- *         userName:
+ *         email:
+ *           type: string
+ *         firebaseUID:
  *           type: string
  *         location:
  *           type: object
@@ -50,8 +52,6 @@ export default router;
  *               type: number
  *             lat:
  *               type: number
- *         password:
- *           type: string
  *     ReservationResponse:
  *       type: object
  *       properties:
@@ -99,11 +99,10 @@ export default router;
  *     ShopModerator:
  *       type: object
  *       properties:
- *         userName:
+ *         email:
  *           type: string
- *         password:
+ *         firebaseUID:
  *           type: string
- *           minLength: 8
  *     UpdateShopInfo:
  *       type: object
  *       properties:
@@ -310,9 +309,9 @@ export default router;
  *                 type: string
  *                 description: The ID of the shop moderator.
  *                 required: true
- *               userName:
+ *               email:
  *                 type: string
- *                 description: The username of the shop moderator.
+ *                 description: The email of the shop moderator.
  *                 required: true
  *           description: List of shop moderators.
  *         availableGames:
@@ -428,11 +427,7 @@ export default router;
  *     UpdateProfileRequest:
  *       type: object
  *       properties:
- *         userName:
- *           type: string
- *         oldPassword:
- *           type: string
- *         newPassword:
+ *         email:
  *           type: string
  */
 /**
@@ -442,19 +437,9 @@ export default router;
  *     Signup:
  *       type: object
  *       properties:
- *         userName:
+ *         email:
  *           type: string
- *         password:
- *           type: string
- *         fcmToken:
- *           type: string
- *           required: false
- *     Login:
- *       type: object
- *       properties:
- *         userName:
- *           type: string
- *         password:
+ *         firebaseUID:
  *           type: string
  *         fcmToken:
  *           type: string

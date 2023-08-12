@@ -7,9 +7,5 @@ export const bookRoom = Joi.object({
 });
 
 export const updateProfile = Joi.object({
-  userName: Joi.string(),
-  oldPassword: Joi.string(),
-  newPassword: Joi.string(),
-})
-  .or("userName", "oldPassword") // userName or oldPassword must be present
-  .and("oldPassword", "newPassword"); // oldPassword and newPassword must be present together if oldPassword is present
+  email: Joi.string().required(),
+});
