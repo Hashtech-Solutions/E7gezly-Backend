@@ -12,6 +12,15 @@ export const getShopInfo = async (req, res, next) => {
   }
 };
 
+export const getShopTable = async (req, res, next) => {
+  try {
+    const table = await shopService.getShopTable(req.shopId);
+    res.status(200).json(table);
+  } catch (error) {
+    return next({status: 400, message: error});
+  }
+};
+
 export const getShopRooms = async (req, res, next) => {
   try {
     const shop = await shopService.getShopById(req.shopId);

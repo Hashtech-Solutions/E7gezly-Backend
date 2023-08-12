@@ -195,6 +195,17 @@ const router = express.Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/RoomResponse'
+ * /shop_moderator/table:
+ *   get:
+ *     summary: Get all reservations and sessions for a shop
+ *     tags: [ShopModerator] 
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TableResponse'
  * /shop_moderator/room/{{room_id}}/session/compute_total:
  *   get:
  *     summary: Compute the total price of a reservation
@@ -366,6 +377,8 @@ router.get("/shop_info", shopController.getShopInfo);
 router.get("/extras", shopController.getShopExtras);
 
 router.get("/room", shopController.getShopRooms);
+
+router.get("/table", shopController.getShopTable);
 
 router.put("/toggle_status", shopController.toggleStatus);
 

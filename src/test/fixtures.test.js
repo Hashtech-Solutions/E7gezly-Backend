@@ -4,8 +4,8 @@ import {Reservation} from "../models/Reservation.js";
 
 export const createShop = async () => {
   const newAdmin = new User({
-    userName: "testAdmin",
-    password: "testPassword",
+    email: "shopadmin@email.com",
+    firebaseUID: "shopadmin",
     role: "shopAdmin",
   });
   const newShop = new Shop({
@@ -18,7 +18,14 @@ export const createShop = async () => {
         status: "available",
         capacity: 4,
       },
+      {
+        roomType: "ps4",
+        name: "room2",
+        status: "available",
+        capacity: 4,
+      } 
     ],
+    numVacancies: 2,
     isOpen: true,
   });
   await newAdmin.save();
