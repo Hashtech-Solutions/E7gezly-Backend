@@ -3,6 +3,30 @@ import {verifyToken} from "../services/firebaseServices.js";
 import * as userService from "../services/userService.js";
 
 /**
+ * Logs in a user with a token.
+ * @function
+ * @async
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ * @returns {Object} The user object.
+ * @throws {Object} The error object.
+ */
+export const login = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) return next({status: 400, message: "Token not found"});
+    const decodedToken = await verifyToken(token);
+    const firebaseUID = decodedToken.uid;
+    const user = await userService.getUserByFirebaseUID(firebaseUID);
+    if (!user) return next({status: 400, message: "User not found"});
+    return res.status(200).json(user);
+  } catch (error) {
+    return next({status: 400, message: error});
+  }
+};
+
+/**
  * Creates a new user account and returns the user object.
  * @function
  * @async
