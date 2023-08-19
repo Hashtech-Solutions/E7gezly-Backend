@@ -85,7 +85,7 @@ export const updateCustomerProfile = async (req, res, next) => {
   try {
     const userId = req.user._id;
     var user = await userService.getUserById(userId);
-    const email = req.body;
+    const {email} = req.body;
     await firebaseService.changeUserEmail(user.firebaseUID, email);
     var oldEmail = user.email;
     if (email) {
