@@ -105,7 +105,11 @@ export const updateCustomerProfile = async (req, res, next) => {
   } catch (error) {
     if (!/auth\/.*/.test(error.code)) {
       // check if error is related to firebase
-      await firebaseService.changeUserEmail(user.firebaseUID, oldEmail); // revert email change if error is not related to firebase to avoid inconsistency
+      try {
+        await firebaseService.changeUserEmail(user.firebaseUID, oldEmail); // revert email change if error is not related to firebase to avoid inconsistency
+      } catch (e) {
+        return next({status: 400, message: e}, req, res, next);
+      }
     }
     return next({status: 400, message: error}, req, res, next);
   }
