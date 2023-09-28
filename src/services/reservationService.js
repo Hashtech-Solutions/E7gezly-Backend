@@ -79,10 +79,10 @@ export const deleteReservationById = async (reservationId) => {
     }
     emitEvent(reservation.shopId, "deleteReservation", reservationId);
     if (reservation.userId) {
-      userService.sendNotification(reservation.userId, {
+      await userService.sendNotification(reservation.userId, {
         deleted: "true",
-        shopId: reservation.shopId,
-        startTime: reservation.startTime,
+        shopId: reservation.shopId.toString(), // ensure that it is a string
+        startTime: reservation.startTime.toString(), // ensure that it is a string
       });
     }
     return reservation;
@@ -119,10 +119,10 @@ export const confirmReservationById = async (reservationId) => {
     await confirmRoomReservation(reservation);
     emitEvent(reservation.shopId, "confirmReservation", reservation);
     if (reservation.userId) {
-      userService.sendNotification(reservation.userId, {
+      await userService.sendNotification(reservation.userId, {
         confirmed: "true",
-        shopId: reservation.shopId,
-        startTime: reservation.startTime,
+        shopId: reservation.shopId.toString(), // ensure that it is a string
+        startTime: reservation.startTime.toString(), // ensure that it is a string
       });
     }
     return reservation;

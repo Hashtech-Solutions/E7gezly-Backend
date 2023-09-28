@@ -7,6 +7,7 @@ const errorHandler = (err, req, res, next) => {
   if (typeof message === "object") {
     message = message.message;
   }
+  if (process.env.NODE_ENV !== "production") console.log(err);
   res.status(status).json({
     success: false,
     status,
